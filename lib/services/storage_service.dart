@@ -31,7 +31,6 @@ class StorageService {
       await prefs.setStringList(_analysisKey, savedAnalyses);
       return true;
     } catch (e) {
-      print('Error saving analysis: $e');
       return false;
     }
   }
@@ -49,7 +48,6 @@ class StorageService {
         return AnalysisResult.fromJson(json);
       }).toList();
     } catch (e) {
-      print('Error getting saved analyses: $e');
       return [];
     }
   }
@@ -74,7 +72,6 @@ class StorageService {
 
       return false;
     } catch (e) {
-      print('Error deleting analysis: $e');
       return false;
     }
   }
@@ -88,7 +85,7 @@ class StorageService {
           return i;
         }
       } catch (e) {
-        print('Error parsing JSON at index $i: $e');
+        throw Exception('Error parsing JSON at index $i: $e');
       }
     }
     return -1;

@@ -24,7 +24,6 @@ class AnalysisService {
   Future<AnalysisResult> _analyzeWithGemini(File imageFile) async {
     try {
       final model = GenerativeModel(
-        // Using the newer Gemini 2.0 Flash model which supports multimodal inputs
         model: 'gemini-2.0-flash',
         apiKey: _geminiApiKey ?? '',
       );
@@ -50,25 +49,19 @@ class AnalysisService {
         throw Exception('Received empty response from Gemini API');
       }
 
-      print('Raw API response:');
-      print(responseText);
 
       // Clean the response text to handle markdown code blocks
       final cleanedText = _cleanJsonResponse(responseText);
-      print('Cleaned response:');
-      print(cleanedText);
 
       // Parse the response text as JSON
       Map<String, dynamic> analysisData;
       try {
         // Try to parse as JSON first
         analysisData = json.decode(cleanedText);
-        print('Successfully parsed as JSON: $analysisData');
 
         // Standardize the keys
         analysisData = _standardizeKeys(analysisData);
       } catch (e) {
-        print('Failed to parse as JSON: $e');
 
         // If not valid JSON, try to extract structured data from the text
         analysisData = _extractStructuredData(responseText);
@@ -84,7 +77,6 @@ class AnalysisService {
         analysis: analysisData,
       );
     } catch (e) {
-      print('Gemini API error: $e');
       throw Exception('Failed to analyze with Gemini: $e');
     }
   }
@@ -146,7 +138,6 @@ class AnalysisService {
   }
 
   Map<String, dynamic> _extractStructuredData(String text) {
-    print('Extracting structured data from text');
 
     // Create a map to store the extracted data
     Map<String, dynamic> result = {
@@ -163,15 +154,12 @@ class AnalysisService {
     final emotionalSection =
         _extractSectionContent(text, 'Emotional State', null);
 
-    print('Personality section: $personalitySection');
-    print('Legibility section: $legibilitySection');
-    print('Emotional section: $emotionalSection');
 
     // Process personality traits
     if (personalitySection.isNotEmpty) {
       // Try to parse as JSON first
       try {
-        final jsonStr = '{' + personalitySection + '}';
+        final jsonStr = '{$personalitySection}';
         final data = json.decode(jsonStr);
         result['personality_traits'] = data;
       } catch (e) {
@@ -189,7 +177,7 @@ class AnalysisService {
     if (legibilitySection.isNotEmpty) {
       // Try to parse as JSON first
       try {
-        final jsonStr = '{' + legibilitySection + '}';
+        final jsonStr = '{$legibilitySection}';
         final data = json.decode(jsonStr);
         result['legibility_assessment'] = data;
       } catch (e) {
@@ -211,7 +199,7 @@ class AnalysisService {
     if (emotionalSection.isNotEmpty) {
       // Try to parse as JSON first
       try {
-        final jsonStr = '{' + emotionalSection + '}';
+        final jsonStr = '{$emotionalSection}';
         final data = json.decode(jsonStr);
         result['emotional_state'] = data;
       } catch (e) {
@@ -300,12 +288,5 @@ class AnalysisService {
       throw Exception(
           'Failed to analyze with custom API: ${response.statusCode}. Response: $responseBody');
     }
-  }
-
-  String _extractSection(String text, String sectionName) {
-    final regex =
-        RegExp('$sectionName[:\\s]*(.*?)(?=\\n\\n|\\Z)', dotAll: true);
-    final match = regex.firstMatch(text);
-    return match?.group(1)?.trim() ?? 'No information available';
   }
 }

@@ -11,9 +11,6 @@ class ResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Print the entire analysis data for debugging
-    print('Analysis result data:');
-    print(analysisResult.analysis);
 
     // Extract analysis data, handling different possible formats
     final personalityTraits =
@@ -156,7 +153,6 @@ class ResultScreen extends StatelessWidget {
 
   // Helper method to extract analysis sections with different possible formats
   dynamic _extractAnalysisSection(Map<String, dynamic> analysis, String key) {
-    print('Extracting section: $key');
 
     // Map of standard keys to the actual keys in the API response
     final keyMappings = {
@@ -170,7 +166,6 @@ class ResultScreen extends StatelessWidget {
       for (final mappedKey in keyMappings[key]!) {
         if (analysis.containsKey(mappedKey)) {
           final value = analysis[mappedKey];
-          print('Found mapped key match: $mappedKey -> $value');
           return value;
         }
       }
@@ -179,7 +174,6 @@ class ResultScreen extends StatelessWidget {
     // If no mapping found, try direct key match
     if (analysis.containsKey(key)) {
       final value = analysis[key];
-      print('Found direct key match: $value');
       return value;
     }
 
@@ -192,7 +186,6 @@ class ResultScreen extends StatelessWidget {
 
     if (analysis.containsKey(capitalizedKey)) {
       final value = analysis[capitalizedKey];
-      print('Found capitalized key match: $value');
       return value;
     }
 
@@ -200,7 +193,6 @@ class ResultScreen extends StatelessWidget {
     final spacedKey = key.replaceAll('_', ' ');
     if (analysis.containsKey(spacedKey)) {
       final value = analysis[spacedKey];
-      print('Found spaced key match: $value');
       return value;
     }
 
@@ -213,11 +205,9 @@ class ResultScreen extends StatelessWidget {
 
     if (analysis.containsKey(capitalizedSpacedKey)) {
       final value = analysis[capitalizedSpacedKey];
-      print('Found capitalized spaced key match: $value');
       return value;
     }
 
-    print('No match found for section: $key');
     // Return empty map as fallback
     return {};
   }
@@ -271,7 +261,6 @@ class ResultScreen extends StatelessWidget {
   }
 
   Widget _buildPersonalityTraitsContent(dynamic personalityTraits) {
-    print('Building personality traits content: $personalityTraits');
 
     if (personalityTraits == null) {
       return const Text('No personality traits information available');
@@ -430,7 +419,6 @@ class ResultScreen extends StatelessWidget {
   }
 
   Widget _buildLegibilityContent(dynamic legibilityAssessment) {
-    print('Building legibility content: $legibilityAssessment');
 
     if (legibilityAssessment == null) {
       return const Text('No legibility assessment available');
@@ -596,7 +584,6 @@ class ResultScreen extends StatelessWidget {
   }
 
   Widget _buildEmotionalStateContent(dynamic emotionalState) {
-    print('Building emotional state content: $emotionalState');
 
     if (emotionalState == null) {
       return const Text('No emotional state information available');
