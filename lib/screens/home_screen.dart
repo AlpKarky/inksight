@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inksight/screens/result_screen.dart';
+import 'package:inksight/screens/saved_analyses_screen.dart';
 import 'package:inksight/services/analysis_service.dart';
 import 'package:inksight/widgets/loading_overlay.dart';
 
@@ -17,6 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final ImagePicker _picker = ImagePicker();
   File? _selectedImage;
   bool _isLoading = false;
+  String _loadingMessage = 'Analyzing handwriting...';
 
   Future<void> _pickImage(ImageSource source) async {
     try {
@@ -87,9 +89,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     setState(() {
       _isLoading = true;
+      _loadingMessage = 'Analyzing handwriting...';
     });
 
     try {
+      setState(() {
+        _loadingMessage = 'Connecting to Gemini API...';
+      });
+
       final analysisService = AnalysisService();
       final result = await analysisService.analyzeHandwriting(_selectedImage!);
 
@@ -103,9 +110,43 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error analyzing handwriting: $e')),
-        );
+        String errorMessage = 'Error analyzing handwriting';
+        String detailedError = e.toString();
+
+        if (detailedError.contains('Gemini')) {
+          errorMessage = 'Error connecting to Gemini API';
+
+          if (detailedError.contains('API key')) {
+            errorMessage =
+                'Invalid or missing Gemini API key. Please check your .env file.';
+          } else if (detailedError.contains('empty response')) {
+            errorMessage =
+                'Received empty response from Gemini API. Please try again.';
+          } else if (detailedError.contains('deprecated')) {
+            errorMessage =
+                'The Gemini model being used is deprecated. Please update the model in the code.';
+          } else if (detailedError.contains('not found') ||
+              detailedError.contains('model not found')) {
+            errorMessage =
+                'The specified Gemini model was not found. Please check the model name in the code.';
+          } else if (detailedError.contains('permission') ||
+              detailedError.contains('access')) {
+            errorMessage =
+                'Permission denied to access the Gemini model. Please check your API key permissions.';
+          } else if (detailedError.contains('quota') ||
+              detailedError.contains('limit')) {
+            errorMessage =
+                'API quota exceeded. Please try again later or upgrade your API plan.';
+          }
+        } else if (detailedError.contains('custom API')) {
+          errorMessage = 'Error connecting to custom API';
+          if (detailedError.contains('not configured')) {
+            errorMessage =
+                'Custom API URL not configured. Please check your .env file.';
+          }
+        }
+
+        _showErrorDialog(errorMessage, detailedError);
       }
     } finally {
       if (mounted) {
@@ -116,14 +157,70 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _showErrorDialog(String errorMessage, String detailedError) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Analysis Error'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(errorMessage),
+              const SizedBox(height: 16),
+              const Text(
+                'Technical Details:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  detailedError,
+                  style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LoadingOverlay(
       isLoading: _isLoading,
+      message: _loadingMessage,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('InkSight'),
           centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.history),
+              tooltip: 'Saved Analyses',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SavedAnalysesScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
         body: SingleChildScrollView(
           child: Padding(

@@ -20,6 +20,8 @@ class LoadingOverlay extends StatelessWidget {
         if (isLoading)
           Container(
             color: Colors.black.withAlpha(128),
+            width: double.infinity,
+            height: double.infinity,
             child: Center(
               child: Container(
                 padding: const EdgeInsets.symmetric(
@@ -29,17 +31,27 @@ class LoadingOverlay extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(50),
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                    ),
+                  ],
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const CircularProgressIndicator(),
+                    const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.indigo),
+                    ),
                     const SizedBox(height: 16.0),
                     Text(
                       message ?? 'Analyzing handwriting...',
                       style: const TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w500,
+                        color: Colors.black87,
                       ),
                     ),
                   ],
