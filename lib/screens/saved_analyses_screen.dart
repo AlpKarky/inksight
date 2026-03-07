@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:inksight/controllers/saved_analyses_controller.dart';
 import 'package:inksight/models/analysis_result.dart';
 import 'package:inksight/screens/result_screen.dart';
-import 'package:inksight/view_models/saved_analyses_view_model.dart';
 import 'package:intl/intl.dart';
 
 class SavedAnalysesScreen extends ConsumerWidget {

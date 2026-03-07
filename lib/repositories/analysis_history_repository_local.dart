@@ -10,10 +10,7 @@ class AnalysisHistoryRepositoryLocal implements AnalysisHistoryRepository {
 
   @override
   Future<void> saveAnalysis(AnalysisResult analysis) async {
-    final success = await _storageService.saveAnalysis(analysis);
-    if (!success) {
-      throw Exception('Failed to save analysis');
-    }
+    await _storageService.saveAnalysis(analysis);
   }
 
   @override
@@ -23,9 +20,6 @@ class AnalysisHistoryRepositoryLocal implements AnalysisHistoryRepository {
 
   @override
   Future<void> deleteAnalysis(String id) async {
-    final success = await _storageService.deleteAnalysis(id);
-    if (!success) {
-      throw Exception('Failed to delete analysis');
-    }
+    await _storageService.deleteAnalysis(id);
   }
 }

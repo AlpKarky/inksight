@@ -5,9 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:inksight/controllers/home_controller.dart';
 import 'package:inksight/screens/result_screen.dart';
 import 'package:inksight/screens/saved_analyses_screen.dart';
-import 'package:inksight/view_models/home_view_model.dart';
 import 'package:inksight/widgets/loading_overlay.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
