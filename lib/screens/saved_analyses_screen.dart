@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:inksight/models/analysis_result.dart';
+import 'package:inksight/repositories/analysis_history_repository.dart';
 import 'package:inksight/screens/result_screen.dart';
-import 'package:inksight/services/storage_service.dart';
+import 'package:inksight/view_models/saved_analyses_view_model.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class SavedAnalysesScreen extends StatefulWidget {
   const SavedAnalysesScreen({super.key});
@@ -13,30 +15,21 @@ class SavedAnalysesScreen extends StatefulWidget {
 }
 
 class _SavedAnalysesScreenState extends State<SavedAnalysesScreen> {
-  final StorageService _storageService = StorageService();
-  List<AnalysisResult> _savedAnalyses = [];
-  bool _isLoading = true;
+  late final SavedAnalysesViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _loadSavedAnalyses();
+    _viewModel = SavedAnalysesViewModel(
+      historyRepository: context.read<AnalysisHistoryRepository>(),
+    );
+    _viewModel.loadSavedAnalyses();
   }
 
-  Future<void> _loadSavedAnalyses() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    final analyses = await _storageService.getSavedAnalyses();
-
-    // Sort analyses by timestamp (newest first)
-    analyses.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-
-    setState(() {
-      _savedAnalyses = analyses;
-      _isLoading = false;
-    });
+  @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
   }
 
   Future<void> _deleteAnalysis(String id) async {
@@ -59,13 +52,14 @@ class _SavedAnalysesScreenState extends State<SavedAnalysesScreen> {
     );
 
     if (confirmed == true) {
-      final success = await _storageService.deleteAnalysis(id);
+      final success = await _viewModel.deleteAnalysis(id);
       if (success) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Analysis deleted')),
         );
-        _loadSavedAnalyses();
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to delete analysis')),
         );
@@ -75,16 +69,19 @@ class _SavedAnalysesScreenState extends State<SavedAnalysesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Saved Analyses'),
-        centerTitle: true,
+    return ListenableBuilder(
+      listenable: _viewModel,
+      builder: (context, _) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Saved Analyses'),
+          centerTitle: true,
+        ),
+        body: _viewModel.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _viewModel.savedAnalyses.isEmpty
+                ? _buildEmptyState()
+                : _buildAnalysisList(),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _savedAnalyses.isEmpty
-              ? _buildEmptyState()
-              : _buildAnalysisList(),
     );
   }
 
@@ -122,9 +119,9 @@ class _SavedAnalysesScreenState extends State<SavedAnalysesScreen> {
   Widget _buildAnalysisList() {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: _savedAnalyses.length,
+      itemCount: _viewModel.savedAnalyses.length,
       itemBuilder: (context, index) {
-        final analysis = _savedAnalyses[index];
+        final analysis = _viewModel.savedAnalyses[index];
         return _buildAnalysisCard(analysis);
       },
     );

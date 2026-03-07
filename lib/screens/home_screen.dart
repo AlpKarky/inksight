@@ -2,10 +2,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:inksight/repositories/analysis_repository.dart';
 import 'package:inksight/screens/result_screen.dart';
 import 'package:inksight/screens/saved_analyses_screen.dart';
-import 'package:inksight/services/analysis_service.dart';
+import 'package:inksight/view_models/home_view_model.dart';
 import 'package:inksight/widgets/loading_overlay.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,8 +19,21 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final ImagePicker _picker = ImagePicker();
   File? _selectedImage;
-  bool _isLoading = false;
-  String _loadingMessage = 'Analyzing handwriting...';
+  late final HomeViewModel _viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = HomeViewModel(
+      analysisRepository: context.read<AnalysisRepository>(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     try {
@@ -87,73 +102,24 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-      _loadingMessage = 'Analyzing handwriting...';
-    });
+    await _viewModel.analyzeHandwriting(_selectedImage!);
 
-    try {
-      setState(() {
-        _loadingMessage = 'Connecting to Gemini API...';
-      });
+    if (!mounted) return;
 
-      final analysisService = AnalysisService();
-      final result = await analysisService.analyzeHandwriting(_selectedImage!);
-
-      if (!mounted) return;
-
+    final result = _viewModel.consumeAnalysisResult();
+    if (result != null) {
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => ResultScreen(analysisResult: result),
         ),
       );
-    } catch (e) {
-      if (mounted) {
-        String errorMessage = 'Error analyzing handwriting';
-        String detailedError = e.toString();
+      return;
+    }
 
-        if (detailedError.contains('Gemini')) {
-          errorMessage = 'Error connecting to Gemini API';
-
-          if (detailedError.contains('API key')) {
-            errorMessage =
-                'Invalid or missing Gemini API key. Please check your .env file.';
-          } else if (detailedError.contains('empty response')) {
-            errorMessage =
-                'Received empty response from Gemini API. Please try again.';
-          } else if (detailedError.contains('deprecated')) {
-            errorMessage =
-                'The Gemini model being used is deprecated. Please update the model in the code.';
-          } else if (detailedError.contains('not found') ||
-              detailedError.contains('model not found')) {
-            errorMessage =
-                'The specified Gemini model was not found. Please check the model name in the code.';
-          } else if (detailedError.contains('permission') ||
-              detailedError.contains('access')) {
-            errorMessage =
-                'Permission denied to access the Gemini model. Please check your API key permissions.';
-          } else if (detailedError.contains('quota') ||
-              detailedError.contains('limit')) {
-            errorMessage =
-                'API quota exceeded. Please try again later or upgrade your API plan.';
-          }
-        } else if (detailedError.contains('custom API')) {
-          errorMessage = 'Error connecting to custom API';
-          if (detailedError.contains('not configured')) {
-            errorMessage =
-                'Custom API URL not configured. Please check your .env file.';
-          }
-        }
-
-        _showErrorDialog(errorMessage, detailedError);
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+    final error = _viewModel.consumeError();
+    if (error != null) {
+      _showErrorDialog(error.message, error.details);
     }
   }
 
@@ -200,122 +166,125 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LoadingOverlay(
-      isLoading: _isLoading,
-      message: _loadingMessage,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('InkSight'),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.history),
-              tooltip: 'Saved Analyses',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SavedAnalysesScreen(),
+    return ListenableBuilder(
+      listenable: _viewModel,
+      builder: (context, _) => LoadingOverlay(
+        isLoading: _viewModel.isLoading,
+        message: _viewModel.loadingMessage,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('InkSight'),
+            centerTitle: true,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.history),
+                tooltip: 'Saved Analyses',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SavedAnalysesScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Analyze Your Handwriting',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                );
-              },
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 20),
-                const Text(
-                  'Analyze Your Handwriting',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Upload or take a photo of your handwriting to discover insights about your personality traits, legibility, and emotional state.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Upload or take a photo of your handwriting to discover insights about your personality traits, legibility, and emotional state.',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 40),
-                _selectedImage == null
-                    ? Container(
-                        height: 300,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
+                  const SizedBox(height: 40),
+                  _selectedImage == null
+                      ? Container(
+                          height: 300,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'No image selected',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        )
+                      : ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'No image selected',
-                            style: TextStyle(color: Colors.grey),
+                          child: Image.file(
+                            _selectedImage!,
+                            height: 300,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
                           ),
                         ),
-                      )
-                    : ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.file(
-                          _selectedImage!,
-                          height: 300,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () => _pickImage(ImageSource.camera),
+                        icon: const Icon(Icons.camera_alt),
+                        label: const Text('Camera'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
                         ),
                       ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () => _pickImage(ImageSource.camera),
-                      icon: const Icon(Icons.camera_alt),
-                      label: const Text('Camera'),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
+                      ElevatedButton.icon(
+                        onPressed: () => _pickImage(ImageSource.gallery),
+                        icon: const Icon(Icons.photo_library),
+                        label: const Text('Gallery'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
                         ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 40),
+                  ElevatedButton(
+                    onPressed:
+                        _selectedImage != null ? _analyzeHandwriting : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    ElevatedButton.icon(
-                      onPressed: () => _pickImage(ImageSource.gallery),
-                      icon: const Icon(Icons.photo_library),
-                      label: const Text('Gallery'),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 40),
-                ElevatedButton(
-                  onPressed:
-                      _selectedImage != null ? _analyzeHandwriting : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                    child: const Text(
+                      'Analyze Handwriting',
+                      style: TextStyle(fontSize: 18),
                     ),
                   ),
-                  child: const Text(
-                    'Analyze Handwriting',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

@@ -1,17 +1,17 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:inksight/models/analysis_result.dart';
-import 'package:inksight/services/storage_service.dart';
+import 'package:inksight/repositories/analysis_history_repository.dart';
+import 'package:inksight/utils/result.dart';
+import 'package:provider/provider.dart';
 
 class ResultScreen extends StatelessWidget {
   final AnalysisResult analysisResult;
-  final StorageService _storageService = StorageService();
 
-  ResultScreen({super.key, required this.analysisResult});
+  const ResultScreen({super.key, required this.analysisResult});
 
   @override
   Widget build(BuildContext context) {
-
     // Extract analysis data, handling different possible formats
     final personalityTraits =
         _extractAnalysisSection(analysisResult.analysis, 'personality_traits');
@@ -123,18 +123,24 @@ class ResultScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () async {
-                    // Save the analysis
-                    final success =
-                        await _storageService.saveAnalysis(analysisResult);
-                    if (success) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Analysis saved')),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Failed to save analysis')),
-                      );
+                    final repository =
+                        context.read<AnalysisHistoryRepository>();
+                    final result =
+                        await repository.saveAnalysis(analysisResult);
+
+                    if (!context.mounted) return;
+
+                    switch (result) {
+                      case Ok<void>():
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Analysis saved')),
+                        );
+                      case Error<void>():
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Failed to save analysis'),
+                          ),
+                        );
                     }
                   },
                   icon: const Icon(Icons.save),
@@ -153,7 +159,6 @@ class ResultScreen extends StatelessWidget {
 
   // Helper method to extract analysis sections with different possible formats
   dynamic _extractAnalysisSection(Map<String, dynamic> analysis, String key) {
-
     // Map of standard keys to the actual keys in the API response
     final keyMappings = {
       'personality_traits': ['Personality traits based on handwriting style'],
@@ -261,7 +266,6 @@ class ResultScreen extends StatelessWidget {
   }
 
   Widget _buildPersonalityTraitsContent(dynamic personalityTraits) {
-
     if (personalityTraits == null) {
       return const Text('No personality traits information available');
     }
@@ -419,7 +423,6 @@ class ResultScreen extends StatelessWidget {
   }
 
   Widget _buildLegibilityContent(dynamic legibilityAssessment) {
-
     if (legibilityAssessment == null) {
       return const Text('No legibility assessment available');
     }
@@ -584,7 +587,6 @@ class ResultScreen extends StatelessWidget {
   }
 
   Widget _buildEmotionalStateContent(dynamic emotionalState) {
-
     if (emotionalState == null) {
       return const Text('No emotional state information available');
     }
