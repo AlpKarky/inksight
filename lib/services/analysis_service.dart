@@ -38,7 +38,7 @@ class AnalysisService {
   Future<AnalysisResult> _analyzeWithGemini(File imageFile) async {
     try {
       final model = GenerativeModel(
-        model: 'gemini-2.0-flash',
+        model: 'gemini-2.5-flash',
         apiKey: _geminiApiKey ?? '',
       );
 

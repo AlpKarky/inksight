@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -43,19 +44,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     try {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: filePath,
-        aspectRatioPresets: [
-          CropAspectRatioPreset.square,
-          CropAspectRatioPreset.ratio3x2,
-          CropAspectRatioPreset.original,
-          CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio16x9,
-        ],
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Crop Image',
             toolbarColor: Theme.of(context).primaryColor,
             toolbarWidgetColor: Colors.white,
             initAspectRatio: CropAspectRatioPreset.original,
+            aspectRatioPresets: const [
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio3x2,
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPreset.ratio16x9,
+            ],
             lockAspectRatio: false,
           ),
           IOSUiSettings(
@@ -141,6 +142,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         actions: [
+          TextButton(
+            onPressed: () async {
+              final textToCopy = '$errorMessage\n\n$detailedError';
+              await Clipboard.setData(ClipboardData(text: textToCopy));
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Error message copied')),
+              );
+            },
+            child: const Text('Copy'),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Close'),
