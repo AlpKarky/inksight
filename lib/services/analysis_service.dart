@@ -7,13 +7,27 @@ import 'package:uuid/uuid.dart';
 import '../models/analysis_result.dart';
 
 class AnalysisService {
-  final String? _geminiApiKey = dotenv.env['GEMINI_API_KEY'];
-  final String? _customApiUrl = dotenv.env['CUSTOM_API_URL'];
+  AnalysisService({Map<String, String>? env}) : _env = env ?? _loadEnv();
+
+  final Map<String, String> _env;
   final Uuid _uuid = Uuid();
 
+  String? get _geminiApiKey => _env['GEMINI_API_KEY'];
+  String? get _customApiUrl => _env['CUSTOM_API_URL'];
+
+  static Map<String, String> _loadEnv() {
+    try {
+      return dotenv.env;
+    } catch (_) {
+      return const {};
+    }
+  }
+
   Future<AnalysisResult> analyzeHandwriting(File imageFile) async {
+    final geminiApiKey = _geminiApiKey;
+
     // Try using Gemini API first
-    if (_geminiApiKey != null && _geminiApiKey.isNotEmpty) {
+    if (geminiApiKey != null && geminiApiKey.isNotEmpty) {
       return await _analyzeWithGemini(imageFile);
     } else {
       // Fallback to custom API
@@ -49,7 +63,6 @@ class AnalysisService {
         throw Exception('Received empty response from Gemini API');
       }
 
-
       // Clean the response text to handle markdown code blocks
       final cleanedText = _cleanJsonResponse(responseText);
 
@@ -62,7 +75,6 @@ class AnalysisService {
         // Standardize the keys
         analysisData = _standardizeKeys(analysisData);
       } catch (e) {
-
         // If not valid JSON, try to extract structured data from the text
         analysisData = _extractStructuredData(responseText);
 
@@ -138,7 +150,6 @@ class AnalysisService {
   }
 
   Map<String, dynamic> _extractStructuredData(String text) {
-
     // Create a map to store the extracted data
     Map<String, dynamic> result = {
       'personality_traits': {},
@@ -153,7 +164,6 @@ class AnalysisService {
         text, 'Legibility Assessment', 'Emotional State');
     final emotionalSection =
         _extractSectionContent(text, 'Emotional State', null);
-
 
     // Process personality traits
     if (personalitySection.isNotEmpty) {
@@ -264,12 +274,13 @@ class AnalysisService {
   }
 
   Future<AnalysisResult> _analyzeWithCustomApi(File imageFile) async {
-    if (_customApiUrl == null || _customApiUrl.isEmpty) {
+    final customApiUrl = _customApiUrl;
+    if (customApiUrl == null || customApiUrl.isEmpty) {
       throw Exception(
           'Custom API URL not configured. Please set CUSTOM_API_URL in your .env file.');
     }
 
-    final request = http.MultipartRequest('POST', Uri.parse(_customApiUrl));
+    final request = http.MultipartRequest('POST', Uri.parse(customApiUrl));
     request.files
         .add(await http.MultipartFile.fromPath('image', imageFile.path));
 

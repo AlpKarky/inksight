@@ -1,45 +1,20 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inksight/models/analysis_result.dart';
 import 'package:inksight/screens/result_screen.dart';
-import 'package:inksight/services/storage_service.dart';
+import 'package:inksight/view_models/saved_analyses_view_model.dart';
 import 'package:intl/intl.dart';
 
-class SavedAnalysesScreen extends StatefulWidget {
+class SavedAnalysesScreen extends ConsumerWidget {
   const SavedAnalysesScreen({super.key});
 
-  @override
-  State<SavedAnalysesScreen> createState() => _SavedAnalysesScreenState();
-}
-
-class _SavedAnalysesScreenState extends State<SavedAnalysesScreen> {
-  final StorageService _storageService = StorageService();
-  List<AnalysisResult> _savedAnalyses = [];
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSavedAnalyses();
-  }
-
-  Future<void> _loadSavedAnalyses() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    final analyses = await _storageService.getSavedAnalyses();
-
-    // Sort analyses by timestamp (newest first)
-    analyses.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-
-    setState(() {
-      _savedAnalyses = analyses;
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _deleteAnalysis(String id) async {
+  Future<void> _deleteAnalysis(
+    BuildContext context,
+    WidgetRef ref,
+    String id,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -58,33 +33,74 @@ class _SavedAnalysesScreenState extends State<SavedAnalysesScreen> {
       ),
     );
 
-    if (confirmed == true) {
-      final success = await _storageService.deleteAnalysis(id);
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Analysis deleted')),
-        );
-        _loadSavedAnalyses();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to delete analysis')),
-        );
-      }
+    if (confirmed != true || !context.mounted) return;
+
+    try {
+      await ref
+          .read(savedAnalysesControllerProvider.notifier)
+          .deleteAnalysis(id);
+
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Analysis deleted')),
+      );
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to delete analysis')),
+      );
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final savedAnalysesAsync = ref.watch(savedAnalysesControllerProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Saved Analyses'),
         centerTitle: true,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _savedAnalyses.isEmpty
-              ? _buildEmptyState()
-              : _buildAnalysisList(),
+      body: savedAnalysesAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => _buildErrorState(context, ref),
+        data: (savedAnalyses) => savedAnalyses.isEmpty
+            ? _buildEmptyState()
+            : _buildAnalysisList(context, ref, savedAnalyses),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, WidgetRef ref) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 80,
+              color: Colors.red.shade300,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Failed to load saved analyses',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () {
+                ref
+                    .read(savedAnalysesControllerProvider.notifier)
+                    .refreshSavedAnalyses();
+              },
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -119,23 +135,28 @@ class _SavedAnalysesScreenState extends State<SavedAnalysesScreen> {
     );
   }
 
-  Widget _buildAnalysisList() {
+  Widget _buildAnalysisList(
+    BuildContext context,
+    WidgetRef ref,
+    List<AnalysisResult> analyses,
+  ) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: _savedAnalyses.length,
+      itemCount: analyses.length,
       itemBuilder: (context, index) {
-        final analysis = _savedAnalyses[index];
-        return _buildAnalysisCard(analysis);
+        final analysis = analyses[index];
+        return _buildAnalysisCard(context, ref, analysis);
       },
     );
   }
 
-  Widget _buildAnalysisCard(AnalysisResult analysis) {
-    // Check if the image file exists
+  Widget _buildAnalysisCard(
+    BuildContext context,
+    WidgetRef ref,
+    AnalysisResult analysis,
+  ) {
     final imageFile = File(analysis.imagePath);
     final imageExists = imageFile.existsSync();
-
-    // Format the date
     final formattedDate =
         DateFormat('MMM d, yyyy • h:mm a').format(analysis.timestamp);
 
@@ -158,7 +179,6 @@ class _SavedAnalysesScreenState extends State<SavedAnalysesScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image preview
             if (imageExists)
               SizedBox(
                 height: 150,
@@ -181,14 +201,11 @@ class _SavedAnalysesScreenState extends State<SavedAnalysesScreen> {
                   ),
                 ),
               ),
-
-            // Analysis details
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Date
                   Text(
                     formattedDate,
                     style: TextStyle(
@@ -197,17 +214,13 @@ class _SavedAnalysesScreenState extends State<SavedAnalysesScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-
-                  // Analysis summary
-                  Text(
+                  const Text(
                     'Handwriting Analysis',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
-                  // Actions
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -225,7 +238,8 @@ class _SavedAnalysesScreenState extends State<SavedAnalysesScreen> {
                         label: const Text('View'),
                       ),
                       TextButton.icon(
-                        onPressed: () => _deleteAnalysis(analysis.id),
+                        onPressed: () =>
+                            _deleteAnalysis(context, ref, analysis.id),
                         icon: const Icon(Icons.delete_outline),
                         label: const Text('Delete'),
                         style: TextButton.styleFrom(

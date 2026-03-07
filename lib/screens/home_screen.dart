@@ -1,24 +1,24 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inksight/screens/result_screen.dart';
 import 'package:inksight/screens/saved_analyses_screen.dart';
-import 'package:inksight/services/analysis_service.dart';
+import 'package:inksight/view_models/home_view_model.dart';
 import 'package:inksight/widgets/loading_overlay.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   final ImagePicker _picker = ImagePicker();
   File? _selectedImage;
-  bool _isLoading = false;
-  String _loadingMessage = 'Analyzing handwriting...';
 
   Future<void> _pickImage(ImageSource source) async {
     try {
@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
           CropAspectRatioPreset.ratio3x2,
           CropAspectRatioPreset.original,
           CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio16x9
+          CropAspectRatioPreset.ratio16x9,
         ],
         uiSettings: [
           AndroidUiSettings(
@@ -87,73 +87,25 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-      _loadingMessage = 'Analyzing handwriting...';
-    });
+    final controller = ref.read(homeAnalysisControllerProvider.notifier);
 
     try {
-      setState(() {
-        _loadingMessage = 'Connecting to Gemini API...';
-      });
-
-      final analysisService = AnalysisService();
-      final result = await analysisService.analyzeHandwriting(_selectedImage!);
+      final result = await controller.analyzeHandwriting(_selectedImage!);
 
       if (!mounted) return;
 
-      Navigator.push(
+      await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => ResultScreen(analysisResult: result),
         ),
       );
-    } catch (e) {
-      if (mounted) {
-        String errorMessage = 'Error analyzing handwriting';
-        String detailedError = e.toString();
 
-        if (detailedError.contains('Gemini')) {
-          errorMessage = 'Error connecting to Gemini API';
-
-          if (detailedError.contains('API key')) {
-            errorMessage =
-                'Invalid or missing Gemini API key. Please check your .env file.';
-          } else if (detailedError.contains('empty response')) {
-            errorMessage =
-                'Received empty response from Gemini API. Please try again.';
-          } else if (detailedError.contains('deprecated')) {
-            errorMessage =
-                'The Gemini model being used is deprecated. Please update the model in the code.';
-          } else if (detailedError.contains('not found') ||
-              detailedError.contains('model not found')) {
-            errorMessage =
-                'The specified Gemini model was not found. Please check the model name in the code.';
-          } else if (detailedError.contains('permission') ||
-              detailedError.contains('access')) {
-            errorMessage =
-                'Permission denied to access the Gemini model. Please check your API key permissions.';
-          } else if (detailedError.contains('quota') ||
-              detailedError.contains('limit')) {
-            errorMessage =
-                'API quota exceeded. Please try again later or upgrade your API plan.';
-          }
-        } else if (detailedError.contains('custom API')) {
-          errorMessage = 'Error connecting to custom API';
-          if (detailedError.contains('not configured')) {
-            errorMessage =
-                'Custom API URL not configured. Please check your .env file.';
-          }
-        }
-
-        _showErrorDialog(errorMessage, detailedError);
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      controller.clearResult();
+    } catch (error) {
+      if (!mounted) return;
+      final analysisError = mapAnalysisError(error);
+      _showErrorDialog(analysisError.message, analysisError.details);
     }
   }
 
@@ -200,9 +152,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final analysisState = ref.watch(homeAnalysisControllerProvider);
+    final loadingMessage = ref.watch(homeAnalysisLoadingMessageProvider);
+
     return LoadingOverlay(
-      isLoading: _isLoading,
-      message: _loadingMessage,
+      isLoading: analysisState.isLoading,
+      message: loadingMessage,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('InkSight'),
