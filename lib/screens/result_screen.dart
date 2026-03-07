@@ -1,17 +1,16 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inksight/models/analysis_result.dart';
-import 'package:inksight/repositories/analysis_history_repository.dart';
-import 'package:inksight/utils/result.dart';
-import 'package:provider/provider.dart';
+import 'package:inksight/providers/app_providers.dart';
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends ConsumerWidget {
   final AnalysisResult analysisResult;
 
   const ResultScreen({super.key, required this.analysisResult});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // Extract analysis data, handling different possible formats
     final personalityTraits =
         _extractAnalysisSection(analysisResult.analysis, 'personality_traits');
@@ -123,24 +122,24 @@ class ResultScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () async {
-                    final repository =
-                        context.read<AnalysisHistoryRepository>();
-                    final result =
-                        await repository.saveAnalysis(analysisResult);
+                    try {
+                      await ref
+                          .read(analysisHistoryRepositoryProvider)
+                          .saveAnalysis(analysisResult);
 
-                    if (!context.mounted) return;
+                      if (!context.mounted) return;
 
-                    switch (result) {
-                      case Ok<void>():
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Analysis saved')),
-                        );
-                      case Error<void>():
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Failed to save analysis'),
-                          ),
-                        );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Analysis saved')),
+                      );
+                    } catch (_) {
+                      if (!context.mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Failed to save analysis'),
+                        ),
+                      );
                     }
                   },
                   icon: const Icon(Icons.save),

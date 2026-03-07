@@ -1,58 +1,39 @@
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inksight/models/analysis_result.dart';
-import 'package:inksight/repositories/analysis_history_repository.dart';
-import 'package:inksight/utils/result.dart';
+import 'package:inksight/providers/app_providers.dart';
 
-class SavedAnalysesViewModel extends ChangeNotifier {
-  SavedAnalysesViewModel({required AnalysisHistoryRepository historyRepository})
-      : _historyRepository = historyRepository;
+final savedAnalysesControllerProvider = AutoDisposeAsyncNotifierProvider<
+    SavedAnalysesController, List<AnalysisResult>>(
+  SavedAnalysesController.new,
+);
 
-  final AnalysisHistoryRepository _historyRepository;
-
-  List<AnalysisResult> _savedAnalyses = [];
-  bool _isLoading = true;
-  String? _errorMessage;
-
-  List<AnalysisResult> get savedAnalyses => _savedAnalyses;
-  bool get isLoading => _isLoading;
-
-  Future<void> loadSavedAnalyses() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    final result = await _historyRepository.getSavedAnalyses();
-    switch (result) {
-      case Ok<List<AnalysisResult>>():
-        final analyses = result.value;
-        analyses.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-        _savedAnalyses = analyses;
-      case Error<List<AnalysisResult>>():
-        _savedAnalyses = [];
-        _errorMessage = 'Failed to load saved analyses';
-    }
-
-    _isLoading = false;
-    notifyListeners();
+class SavedAnalysesController
+    extends AutoDisposeAsyncNotifier<List<AnalysisResult>> {
+  @override
+  FutureOr<List<AnalysisResult>> build() {
+    return _fetchSavedAnalyses();
   }
 
-  Future<bool> deleteAnalysis(String id) async {
-    final result = await _historyRepository.deleteAnalysis(id);
-    switch (result) {
-      case Ok<void>():
-        _savedAnalyses.removeWhere((analysis) => analysis.id == id);
-        notifyListeners();
-        return true;
-      case Error<void>():
-        _errorMessage = 'Failed to delete analysis';
-        notifyListeners();
-        return false;
-    }
+  Future<List<AnalysisResult>> _fetchSavedAnalyses() async {
+    final analyses =
+        await ref.read(analysisHistoryRepositoryProvider).getSavedAnalyses();
+    analyses.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    return analyses;
   }
 
-  String? consumeErrorMessage() {
-    final message = _errorMessage;
-    _errorMessage = null;
-    return message;
+  Future<void> refreshSavedAnalyses() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(_fetchSavedAnalyses);
+  }
+
+  Future<void> deleteAnalysis(String id) async {
+    await ref.read(analysisHistoryRepositoryProvider).deleteAnalysis(id);
+
+    final currentAnalyses = state.valueOrNull ?? const <AnalysisResult>[];
+    final updatedAnalyses =
+        currentAnalyses.where((analysis) => analysis.id != id).toList();
+    state = AsyncData(updatedAnalyses);
   }
 }
