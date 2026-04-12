@@ -6,154 +6,87 @@ part of 'app_router.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appRouterHash() => r'10b18500aee16335f986cc881145f4739e6a5803';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [appRouter].
 @ProviderFor(appRouter)
-const appRouterProvider = AppRouterFamily();
+const appRouterProvider = AppRouterFamily._();
 
-/// See also [appRouter].
-class AppRouterFamily extends Family<GoRouter> {
-  /// See also [appRouter].
-  const AppRouterFamily();
-
-  /// See also [appRouter].
-  AppRouterProvider call(
-    User? currentUser,
-  ) {
-    return AppRouterProvider(
-      currentUser,
-    );
-  }
-
-  @override
-  AppRouterProvider getProviderOverride(
-    covariant AppRouterProvider provider,
-  ) {
-    return call(
-      provider.currentUser,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'appRouterProvider';
-}
-
-/// See also [appRouter].
-class AppRouterProvider extends AutoDisposeProvider<GoRouter> {
-  /// See also [appRouter].
-  AppRouterProvider(
-    User? currentUser,
-  ) : this._internal(
-          (ref) => appRouter(
-            ref as AppRouterRef,
-            currentUser,
-          ),
-          from: appRouterProvider,
+final class AppRouterProvider
+    extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
+    with $Provider<GoRouter> {
+  const AppRouterProvider._(
+      {required AppRouterFamily super.from,
+      required UserEntity? super.argument})
+      : super(
+          retry: null,
           name: r'appRouterProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$appRouterHash,
-          dependencies: AppRouterFamily._dependencies,
-          allTransitiveDependencies: AppRouterFamily._allTransitiveDependencies,
-          currentUser: currentUser,
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  AppRouterProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.currentUser,
-  }) : super.internal();
-
-  final User? currentUser;
+  @override
+  String debugGetCreateSourceHash() => _$appRouterHash();
 
   @override
-  Override overrideWith(
-    GoRouter Function(AppRouterRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: AppRouterProvider._internal(
-        (ref) => create(ref as AppRouterRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        currentUser: currentUser,
-      ),
+  String toString() {
+    return r'appRouterProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<GoRouter> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  GoRouter create(Ref ref) {
+    final argument = this.argument as UserEntity?;
+    return appRouter(
+      ref,
+      argument,
     );
   }
 
-  @override
-  AutoDisposeProviderElement<GoRouter> createElement() {
-    return _AppRouterProviderElement(this);
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GoRouter value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GoRouter>(value),
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return other is AppRouterProvider && other.currentUser == currentUser;
+    return other is AppRouterProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, currentUser.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin AppRouterRef on AutoDisposeProviderRef<GoRouter> {
-  /// The parameter `currentUser` of this provider.
-  User? get currentUser;
-}
+String _$appRouterHash() => r'3b9568322bbdd2e5659ea7d271ecd8e066c613d7';
 
-class _AppRouterProviderElement extends AutoDisposeProviderElement<GoRouter>
-    with AppRouterRef {
-  _AppRouterProviderElement(super.provider);
+final class AppRouterFamily extends $Family
+    with $FunctionalFamilyOverride<GoRouter, UserEntity?> {
+  const AppRouterFamily._()
+      : super(
+          retry: null,
+          name: r'appRouterProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  AppRouterProvider call(
+    UserEntity? currentUser,
+  ) =>
+      AppRouterProvider._(argument: currentUser, from: this);
 
   @override
-  User? get currentUser => (origin as AppRouterProvider).currentUser;
+  String toString() => r'appRouterProvider';
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

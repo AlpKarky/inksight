@@ -4,7 +4,7 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.6.1
+  sdk: ^3.8.0
 
 dependencies:
   connectivity_plus:
@@ -14,7 +14,7 @@ dependencies:
   flutter_dotenv:
   flutter_localizations:
     sdk: flutter
-  flutter_riverpod:
+  flutter_riverpod: ^3.0.0
   freezed_annotation:
   go_router:
   http:
@@ -23,7 +23,7 @@ dependencies:
   intl:
   json_annotation:
   path_provider:
-  riverpod_annotation:
+  riverpod_annotation: ^3.0.0
   shared_preferences:
   supabase_flutter:
   uuid:
@@ -36,8 +36,8 @@ dev_dependencies:
   freezed:
   json_serializable:
   mocktail:
-  riverpod_generator:
-  riverpod_lint:
+  riverpod_generator: ^3.0.0
+  riverpod_lint: ^3.0.0
   very_good_analysis:
 
 flutter:

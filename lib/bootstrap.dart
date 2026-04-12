@@ -17,16 +17,25 @@ Future<void> bootstrap() async {
   final supabaseUrl = AppEnv.supabaseUrl;
   final supabaseKey = AppEnv.supabasePublishableKey;
 
+  final hasCredentials = supabaseUrl.isNotEmpty && supabaseKey.isNotEmpty;
+
+  if (!hasCredentials && !AppEnv.isDev) {
+    throw StateError(
+      'Supabase credentials are required in ${AppEnv.environment} mode. '
+      'Set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY in your .env file.',
+    );
+  }
+
   late final AuthRemoteDataSource dataSource;
 
-  if (supabaseUrl.isNotEmpty && supabaseKey.isNotEmpty) {
+  if (hasCredentials) {
     await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
     dataSource = AuthRemoteDataSourceImpl(client: Supabase.instance.client);
   } else {
     dataSource = AuthLocalDataSource();
   }
 
-  final overrides = <Override>[
+  final overrides = [
     authRepositoryProvider.overrideWithValue(
       AuthRepositoryImpl(dataSource: dataSource),
     ),
@@ -37,7 +46,11 @@ Future<void> bootstrap() async {
       supportedLocales: const [Locale('en')],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
-      child: ProviderScope(overrides: overrides, child: const App()),
+      child: ProviderScope(
+        retry: (retryCount, error) => null,
+        overrides: overrides,
+        child: const App(),
+      ),
     ),
   );
 }

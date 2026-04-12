@@ -4,7 +4,7 @@ import 'package:inksight/core/errors/result.dart';
 import 'package:inksight/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:inksight/features/auth/data/models/user_model.dart';
 import 'package:inksight/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:inksight/features/auth/domain/entities/user.dart';
+import 'package:inksight/features/auth/domain/entities/user_entity.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
@@ -19,7 +19,7 @@ void main() {
     createdAt: DateTime(2024),
   );
 
-  final testUser = User(
+  final testUser = UserEntity(
     id: 'test-id',
     email: 'test@example.com',
     createdAt: DateTime(2024),
@@ -44,8 +44,8 @@ void main() {
         password: 'password123',
       );
 
-      expect(result, isA<Success<User>>());
-      expect((result as Success<User>).data, testUser);
+      expect(result, isA<Success<UserEntity>>());
+      expect((result as Success<UserEntity>).data, testUser);
       verify(
         () => mockDataSource.signIn(
           email: 'test@example.com',
@@ -67,9 +67,9 @@ void main() {
         password: 'wrong',
       );
 
-      expect(result, isA<Failure<User>>());
+      expect(result, isA<Failure<UserEntity>>());
       expect(
-        (result as Failure<User>).error,
+        (result as Failure<UserEntity>).error,
         isA<AuthInvalidCredentialsFailure>(),
       );
     });
@@ -89,8 +89,11 @@ void main() {
         password: 'password123',
       );
 
-      expect(result, isA<Success<User>>());
-      expect((result as Success<User>).data.email, 'test@example.com');
+      expect(result, isA<Success<UserEntity>>());
+      expect(
+        (result as Success<UserEntity>).data.email,
+        'test@example.com',
+      );
     });
 
     test('returns Failure when email is in use', () async {
@@ -106,9 +109,9 @@ void main() {
         password: 'password123',
       );
 
-      expect(result, isA<Failure<User>>());
+      expect(result, isA<Failure<UserEntity>>());
       expect(
-        (result as Failure<User>).error,
+        (result as Failure<UserEntity>).error,
         isA<AuthEmailInUseFailure>(),
       );
     });

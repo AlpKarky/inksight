@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:inksight/core/constants/debug_messages.dart';
 import 'package:inksight/core/errors/failures.dart';
 import 'package:inksight/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:inksight/features/auth/data/models/user_model.dart';
@@ -55,7 +56,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final user = response.user;
       if (user == null) {
         throw const AuthUnknownFailure(
-          message: 'Sign up succeeded but no user was returned.',
+          message: DebugMessages.signUpNoUser,
         );
       }
 

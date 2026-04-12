@@ -1,7 +1,7 @@
 import 'package:inksight/core/errors/failures.dart';
 import 'package:inksight/core/errors/result.dart';
 import 'package:inksight/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:inksight/features/auth/domain/entities/user.dart';
+import 'package:inksight/features/auth/domain/entities/user_entity.dart';
 import 'package:inksight/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -11,7 +11,7 @@ class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _dataSource;
 
   @override
-  Future<Result<User>> signIn({
+  Future<Result<UserEntity>> signIn({
     required String email,
     required String password,
   }) async {
@@ -27,7 +27,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Result<User>> signUp({
+  Future<Result<UserEntity>> signUp({
     required String email,
     required String password,
   }) async {
@@ -53,11 +53,11 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Stream<User?> get authStateChanges {
+  Stream<UserEntity?> get authStateChanges {
     return _dataSource.authStateChanges
         .map((userModel) => userModel?.toDomain());
   }
 
   @override
-  User? get currentUser => _dataSource.currentUser?.toDomain();
+  UserEntity? get currentUser => _dataSource.currentUser?.toDomain();
 }

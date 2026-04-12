@@ -8,7 +8,6 @@ analyzer:
     - "**/*.freezed.dart"
   errors:
     invalid_annotation_target: ignore
-    deprecated_member_use_from_same_package: ignore
 
 linter:
   rules:

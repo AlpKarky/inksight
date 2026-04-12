@@ -1,20 +1,20 @@
 import 'package:inksight/core/errors/result.dart';
-import 'package:inksight/features/auth/domain/entities/user.dart';
+import 'package:inksight/features/auth/domain/entities/user_entity.dart';
 
 abstract class AuthRepository {
-  Future<Result<User>> signIn({
+  Future<Result<UserEntity>> signIn({
     required String email,
     required String password,
   });
 
-  Future<Result<User>> signUp({
+  Future<Result<UserEntity>> signUp({
     required String email,
     required String password,
   });
 
   Future<Result<void>> signOut();
 
-  Stream<User?> get authStateChanges;
+  Stream<UserEntity?> get authStateChanges;
 
-  User? get currentUser;
+  UserEntity? get currentUser;
 }

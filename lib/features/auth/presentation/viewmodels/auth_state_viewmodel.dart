@@ -1,6 +1,7 @@
+import 'package:inksight/core/constants/debug_messages.dart';
 import 'package:inksight/core/errors/failures.dart';
 import 'package:inksight/core/errors/result.dart';
-import 'package:inksight/features/auth/domain/entities/user.dart' as domain;
+import 'package:inksight/features/auth/domain/entities/user_entity.dart';
 import 'package:inksight/features/auth/domain/repositories/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -9,7 +10,7 @@ part 'auth_state_viewmodel.g.dart';
 @Riverpod(keepAlive: true)
 class AuthStateViewModel extends _$AuthStateViewModel {
   @override
-  domain.User? build() {
+  UserEntity? build() {
     final repository = ref.watch(authRepositoryProvider);
     final subscription = repository.authStateChanges.listen((user) {
       state = user;
@@ -24,7 +25,7 @@ class AuthStateViewModel extends _$AuthStateViewModel {
 /// Default returns null (no auth backend configured).
 /// Overridden in bootstrap.dart when Supabase credentials are available.
 @Riverpod(keepAlive: true)
-AuthRepository authRepository(AuthRepositoryRef ref) {
+AuthRepository authRepository(Ref ref) {
   return const _NoOpAuthRepository();
 }
 
@@ -34,37 +35,37 @@ class _NoOpAuthRepository implements AuthRepository {
   const _NoOpAuthRepository();
 
   @override
-  Stream<domain.User?> get authStateChanges => const Stream.empty();
+  Stream<UserEntity?> get authStateChanges => const Stream.empty();
 
   @override
-  domain.User? get currentUser => null;
+  UserEntity? get currentUser => null;
 
   @override
-  Future<Result<domain.User>> signIn({
+  Future<Result<UserEntity>> signIn({
     required String email,
     required String password,
   }) async =>
       const Failure(
         AuthUnknownFailure(
-          message: 'Auth not configured. Set Supabase credentials in .env.',
+          message: DebugMessages.authNotConfigured,
         ),
       );
 
   @override
-  Future<Result<domain.User>> signUp({
+  Future<Result<UserEntity>> signUp({
     required String email,
     required String password,
   }) async =>
       const Failure(
         AuthUnknownFailure(
-          message: 'Auth not configured. Set Supabase credentials in .env.',
+          message: DebugMessages.authNotConfigured,
         ),
       );
 
   @override
   Future<Result<void>> signOut() async => const Failure(
     AuthUnknownFailure(
-      message: 'Auth not configured. Set Supabase credentials in .env.',
+      message: DebugMessages.authNotConfigured,
     ),
   );
 }

@@ -10,14 +10,11 @@ extension BuildContextExtensions on BuildContext {
   AppTextThemeExtension get appTextTheme =>
       Theme.of(this).extension<AppTextThemeExtension>()!;
 
-  AppDimensionsExtension get dimensions =>
-      Theme.of(this).extension<AppDimensionsExtension>()!;
+  AppDimensions get dimensions => AppDimensions.of(this);
 
   ThemeData get theme => Theme.of(this);
 
-  MediaQueryData get mediaQuery => MediaQuery.of(this);
-
-  Size get screenSize => mediaQuery.size;
+  Size get screenSize => MediaQuery.sizeOf(this);
 
   void showSnackBar(String message) {
     ScaffoldMessenger.of(this)

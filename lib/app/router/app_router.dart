@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inksight/app/router/routes.dart';
-import 'package:inksight/features/auth/domain/entities/user.dart';
+import 'package:inksight/features/auth/domain/entities/user_entity.dart';
 import 'package:inksight/features/auth/presentation/screens/login_screen.dart';
 import 'package:inksight/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -22,7 +22,7 @@ class _HomeScreenPlaceholder extends StatelessWidget {
 }
 
 @riverpod
-GoRouter appRouter(AppRouterRef ref, User? currentUser) {
+GoRouter appRouter(Ref ref, UserEntity? currentUser) {
   return GoRouter(
     initialLocation: Routes.home,
     redirect: (context, state) {

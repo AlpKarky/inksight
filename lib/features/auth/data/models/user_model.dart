@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:inksight/features/auth/domain/entities/user.dart';
+import 'package:inksight/features/auth/domain/entities/user_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 part 'user_model.freezed.dart';
@@ -26,7 +26,7 @@ abstract class UserModel with _$UserModel {
     );
   }
 
-  User toDomain() {
-    return User(id: id, email: email, createdAt: createdAt);
+  UserEntity toDomain() {
+    return UserEntity(id: id, email: email, createdAt: createdAt);
   }
 }

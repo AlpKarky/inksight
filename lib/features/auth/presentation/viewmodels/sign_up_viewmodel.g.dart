@@ -6,21 +6,47 @@ part of 'sign_up_viewmodel.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(SignUpViewModel)
+const signUpViewModelProvider = SignUpViewModelProvider._();
+
+final class SignUpViewModelProvider
+    extends $AsyncNotifierProvider<SignUpViewModel, void> {
+  const SignUpViewModelProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'signUpViewModelProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$signUpViewModelHash();
+
+  @$internal
+  @override
+  SignUpViewModel create() => SignUpViewModel();
+}
+
 String _$signUpViewModelHash() => r'cedad31f473654c5e679bcde93776537ec039101';
 
-/// See also [SignUpViewModel].
-@ProviderFor(SignUpViewModel)
-final signUpViewModelProvider =
-    AutoDisposeAsyncNotifierProvider<SignUpViewModel, void>.internal(
-  SignUpViewModel.new,
-  name: r'signUpViewModelProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$signUpViewModelHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$SignUpViewModel = AutoDisposeAsyncNotifier<void>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$SignUpViewModel extends $AsyncNotifier<void> {
+  FutureOr<void> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    build();
+    final ref = this.ref as $Ref<AsyncValue<void>, void>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<void>, void>,
+        AsyncValue<void>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, null);
+  }
+}

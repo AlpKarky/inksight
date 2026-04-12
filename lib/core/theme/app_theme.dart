@@ -4,6 +4,8 @@ import 'package:inksight/core/theme/app_dimensions.dart';
 import 'package:inksight/core/theme/app_text_theme.dart';
 
 abstract final class AppTheme {
+  static const AppDimensions _dims = AppDimensions.fallback;
+
   static ThemeData get light {
     const colors = AppColorsExtension.light;
     return ThemeData(
@@ -22,13 +24,11 @@ abstract final class AppTheme {
           backgroundColor: colors.primary,
           foregroundColor: colors.onPrimary,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              AppDimensionsExtension.standard.radiusMd,
-            ),
+            borderRadius: BorderRadius.circular(_dims.radiusMd),
           ),
           padding: EdgeInsets.symmetric(
-            horizontal: AppDimensionsExtension.standard.spacingLg,
-            vertical: AppDimensionsExtension.standard.spacingMd,
+            horizontal: _dims.spacingLg,
+            vertical: _dims.spacingMd,
           ),
         ),
       ),
@@ -36,32 +36,25 @@ abstract final class AppTheme {
         filled: true,
         fillColor: colors.surfaceVariant,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            AppDimensionsExtension.standard.radiusMd,
-          ),
+          borderRadius: BorderRadius.circular(_dims.radiusMd),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            AppDimensionsExtension.standard.radiusMd,
-          ),
+          borderRadius: BorderRadius.circular(_dims.radiusMd),
           borderSide: BorderSide(color: colors.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            AppDimensionsExtension.standard.radiusMd,
-          ),
+          borderRadius: BorderRadius.circular(_dims.radiusMd),
           borderSide: BorderSide(color: colors.error),
         ),
         contentPadding: EdgeInsets.symmetric(
-          horizontal: AppDimensionsExtension.standard.spacingMd,
-          vertical: AppDimensionsExtension.standard.spacingMd,
+          horizontal: _dims.spacingMd,
+          vertical: _dims.spacingMd,
         ),
       ),
       extensions: const [
         AppColorsExtension.light,
         AppTextThemeExtension.light,
-        AppDimensionsExtension.standard,
       ],
     );
   }
@@ -84,13 +77,11 @@ abstract final class AppTheme {
           backgroundColor: colors.primary,
           foregroundColor: colors.onPrimary,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              AppDimensionsExtension.standard.radiusMd,
-            ),
+            borderRadius: BorderRadius.circular(_dims.radiusMd),
           ),
           padding: EdgeInsets.symmetric(
-            horizontal: AppDimensionsExtension.standard.spacingLg,
-            vertical: AppDimensionsExtension.standard.spacingMd,
+            horizontal: _dims.spacingLg,
+            vertical: _dims.spacingMd,
           ),
         ),
       ),
@@ -98,32 +89,25 @@ abstract final class AppTheme {
         filled: true,
         fillColor: colors.surfaceVariant,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            AppDimensionsExtension.standard.radiusMd,
-          ),
+          borderRadius: BorderRadius.circular(_dims.radiusMd),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            AppDimensionsExtension.standard.radiusMd,
-          ),
+          borderRadius: BorderRadius.circular(_dims.radiusMd),
           borderSide: BorderSide(color: colors.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            AppDimensionsExtension.standard.radiusMd,
-          ),
+          borderRadius: BorderRadius.circular(_dims.radiusMd),
           borderSide: BorderSide(color: colors.error),
         ),
         contentPadding: EdgeInsets.symmetric(
-          horizontal: AppDimensionsExtension.standard.spacingMd,
-          vertical: AppDimensionsExtension.standard.spacingMd,
+          horizontal: _dims.spacingMd,
+          vertical: _dims.spacingMd,
         ),
       ),
       extensions: const [
         AppColorsExtension.dark,
         AppTextThemeExtension.dark,
-        AppDimensionsExtension.standard,
       ],
     );
   }

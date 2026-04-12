@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:inksight/core/errors/failures.dart';
 import 'package:inksight/core/errors/result.dart';
-import 'package:inksight/features/auth/domain/entities/user.dart';
+import 'package:inksight/features/auth/domain/entities/user_entity.dart';
 import 'package:inksight/features/auth/domain/repositories/auth_repository.dart';
 import 'package:inksight/features/auth/presentation/viewmodels/auth_state_viewmodel.dart';
 import 'package:inksight/features/auth/presentation/viewmodels/login_viewmodel.dart';
@@ -14,7 +14,7 @@ void main() {
   late MockAuthRepository mockRepository;
   late ProviderContainer container;
 
-  final testUser = User(
+  final testUser = UserEntity(
     id: 'test-id',
     email: 'test@example.com',
     createdAt: DateTime(2024),
