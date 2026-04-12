@@ -1,0 +1,53 @@
+{
+  "app": {
+    "name": "InkSight"
+  },
+  "auth": {
+    "login_title": "Welcome Back",
+    "login_subtitle": "Sign in to continue",
+    "sign_up_title": "Create Account",
+    "sign_up_subtitle": "Sign up to get started",
+    "email_hint": "Email address",
+    "password_hint": "Password",
+    "sign_in_button": "Sign In",
+    "sign_up_button": "Sign Up",
+    "no_account": "Don't have an account? ",
+    "no_account_action": "Sign Up",
+    "have_account": "Already have an account? ",
+    "have_account_action": "Sign In"
+  },
+  "home": {
+    "title": "InkSight",
+    "analyze_title": "Analyze Your Handwriting",
+    "analyze_subtitle": "Upload or take a photo of your handwriting to discover insights about your personality traits, legibility, and emotional state.",
+    "no_image": "No image selected",
+    "camera": "Camera",
+    "gallery": "Gallery",
+    "analyze_button": "Analyze Handwriting"
+  },
+  "errors": {
+    "invalid_credentials": "Invalid email or password.",
+    "email_in_use": "This email is already registered.",
+    "weak_password": "Password is too weak. Use at least 6 characters.",
+    "session_expired": "Session expired. Please sign in again.",
+    "no_connection": "No internet connection. Please check your network.",
+    "server_error": "Server error. Please try again later.",
+    "timeout": "Request timed out. Please try again.",
+    "unknown": "An unexpected error occurred."
+  },
+  "validation": {
+    "email_required": "Email is required.",
+    "email_invalid": "Please enter a valid email address.",
+    "password_required": "Password is required.",
+    "password_too_short": "Password must be at least 6 characters.",
+    "field_required": "This field is required."
+  },
+  "common": {
+    "loading": "Loading...",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "close": "Close"
+  }
+}
