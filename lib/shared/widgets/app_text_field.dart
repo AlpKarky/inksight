@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class AppTextField extends StatelessWidget {
@@ -30,7 +31,12 @@ class AppTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
-      validator: validator,
+      validator: validator != null
+          ? (value) {
+              final key = validator!(value);
+              return key != null ? context.tr(key) : null;
+            }
+          : null,
       obscureText: obscureText,
       keyboardType: keyboardType,
       textInputAction: textInputAction,

@@ -124,3 +124,37 @@ final class StorageWriteFailure extends StorageFailure {
     super.stackTrace,
   });
 }
+
+// -- Analysis Failures --
+
+sealed class AnalysisFailure extends AppFailure {
+  const AnalysisFailure({
+    required super.message,
+    super.cause,
+    super.stackTrace,
+  });
+}
+
+final class AnalysisRemoteFailure extends AnalysisFailure {
+  const AnalysisRemoteFailure({
+    super.message = DebugMessages.analysisApiFailed,
+    super.cause,
+    super.stackTrace,
+  });
+}
+
+final class AnalysisParseFailure extends AnalysisFailure {
+  const AnalysisParseFailure({
+    super.message = DebugMessages.analysisParseFailed,
+    super.cause,
+    super.stackTrace,
+  });
+}
+
+final class AnalysisNoImageFailure extends AnalysisFailure {
+  const AnalysisNoImageFailure({
+    super.message = DebugMessages.analysisNoImage,
+    super.cause,
+    super.stackTrace,
+  });
+}

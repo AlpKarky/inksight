@@ -23,4 +23,15 @@ abstract final class DebugMessages {
   // Storage
   static const storageRead = 'Failed to read from storage.';
   static const storageWrite = 'Failed to write to storage.';
+
+  // Analysis
+  static const analysisApiFailed =
+      'Failed to analyze handwriting via API.';
+  static const analysisParseFailed =
+      'Failed to parse analysis response.';
+  static const analysisNoImage = 'No image selected for analysis.';
+  static const analysisInvalidApiKey =
+      'Invalid or missing Gemini API key.';
+  static const analysisQuotaExceeded =
+      'API quota exceeded. Try again later.';
 }

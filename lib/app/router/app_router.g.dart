@@ -15,16 +15,16 @@ const appRouterProvider = AppRouterFamily._();
 final class AppRouterProvider
     extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
     with $Provider<GoRouter> {
-  const AppRouterProvider._(
-      {required AppRouterFamily super.from,
-      required UserEntity? super.argument})
-      : super(
-          retry: null,
-          name: r'appRouterProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  const AppRouterProvider._({
+    required AppRouterFamily super.from,
+    required UserEntity? super.argument,
+  }) : super(
+         retry: null,
+         name: r'appRouterProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$appRouterHash();
@@ -44,10 +44,7 @@ final class AppRouterProvider
   @override
   GoRouter create(Ref ref) {
     final argument = this.argument as UserEntity?;
-    return appRouter(
-      ref,
-      argument,
-    );
+    return appRouter(ref, argument);
   }
 
   /// {@macro riverpod.override_with_value}
@@ -69,22 +66,20 @@ final class AppRouterProvider
   }
 }
 
-String _$appRouterHash() => r'3b9568322bbdd2e5659ea7d271ecd8e066c613d7';
+String _$appRouterHash() => r'3dfe8cb8df0ffb5c2fa5780f8dd00ecce40ea0a1';
 
 final class AppRouterFamily extends $Family
     with $FunctionalFamilyOverride<GoRouter, UserEntity?> {
   const AppRouterFamily._()
-      : super(
-          retry: null,
-          name: r'appRouterProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'appRouterProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-  AppRouterProvider call(
-    UserEntity? currentUser,
-  ) =>
+  AppRouterProvider call(UserEntity? currentUser) =>
       AppRouterProvider._(argument: currentUser, from: this);
 
   @override

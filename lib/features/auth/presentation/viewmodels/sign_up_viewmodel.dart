@@ -30,6 +30,7 @@ class SignUpViewModel extends _$SignUpViewModel {
 
     final repository = ref.read(authRepositoryProvider);
     final result = await repository.signUp(email: email, password: password);
+    if (!ref.mounted) return;
 
     state = switch (result) {
       Success() => const AsyncData(null),

@@ -7,7 +7,6 @@ environment:
   sdk: ^3.8.0
 
 dependencies:
-  connectivity_plus:
   easy_localization:
   flutter:
     sdk: flutter
@@ -22,7 +21,6 @@ dependencies:
   image_picker:
   intl:
   json_annotation:
-  path_provider:
   riverpod_annotation: ^3.0.0
   shared_preferences:
   supabase_flutter:

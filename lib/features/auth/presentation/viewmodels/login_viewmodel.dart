@@ -30,6 +30,7 @@ class LoginViewModel extends _$LoginViewModel {
 
     final repository = ref.read(authRepositoryProvider);
     final result = await repository.signIn(email: email, password: password);
+    if (!ref.mounted) return;
 
     state = switch (result) {
       Success() => const AsyncData(null),

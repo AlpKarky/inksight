@@ -15,15 +15,15 @@ const authStateViewModelProvider = AuthStateViewModelProvider._();
 final class AuthStateViewModelProvider
     extends $NotifierProvider<AuthStateViewModel, UserEntity?> {
   const AuthStateViewModelProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'authStateViewModelProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'authStateViewModelProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$authStateViewModelHash();
@@ -51,8 +51,14 @@ abstract class _$AuthStateViewModel extends $Notifier<UserEntity?> {
   void runBuild() {
     final created = build();
     final ref = this.ref as $Ref<UserEntity?, UserEntity?>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<UserEntity?, UserEntity?>, UserEntity?, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<UserEntity?, UserEntity?>,
+              UserEntity?,
+              Object?,
+              Object?
+            >;
     element.handleValue(ref, created);
   }
 }
@@ -72,15 +78,15 @@ final class AuthRepositoryProvider
   /// Default returns null (no auth backend configured).
   /// Overridden in bootstrap.dart when Supabase credentials are available.
   const AuthRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'authRepositoryProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'authRepositoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$authRepositoryHash();
