@@ -34,7 +34,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
     if (!mounted) return;
 
     if (saved) {
-      context.go(Routes.history);
+      context.pushReplacement(Routes.history);
     } else {
       setState(() => _isSaving = false);
       context.showSnackBar(
