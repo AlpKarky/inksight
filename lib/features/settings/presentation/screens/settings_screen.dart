@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inksight/core/errors/result.dart';
 import 'package:inksight/core/extensions/context_extensions.dart';
+import 'package:inksight/core/localization/localized_date_formatting.dart';
 import 'package:inksight/features/auth/presentation/viewmodels/auth_state_viewmodel.dart';
 import 'package:inksight/features/settings/presentation/viewmodels/theme_mode_viewmodel.dart';
 import 'package:inksight/shared/presentation/failure_mapper.dart';
@@ -118,9 +119,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         ),
                         SizedBox(height: dims.spacingXs),
                         Text(
-                          DateFormat.yMMMMd(
-                            context.locale.toString(),
-                          ).format(user.createdAt),
+                          context.formatLongDate(user.createdAt),
                           style: context.appTextTheme.bodyMedium,
                         ),
                       ],

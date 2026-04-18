@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inksight/app/router/routes.dart';
 import 'package:inksight/core/extensions/context_extensions.dart';
+import 'package:inksight/core/localization/localized_date_formatting.dart';
 import 'package:inksight/features/analysis/domain/entities/analysis_entity.dart';
 import 'package:inksight/features/analysis/presentation/viewmodels/analysis_viewmodel.dart';
 import 'package:inksight/features/analysis/presentation/viewmodels/history_viewmodel.dart';
@@ -181,8 +182,7 @@ class _AnalysisCard extends StatelessWidget {
     final dims = context.dimensions;
     final imageFile = File(analysis.imagePath);
     final imageExists = imageFile.existsSync();
-    final formattedDate =
-        DateFormat.yMMMd().add_jm().format(analysis.timestamp);
+    final formattedDate = context.formatAnalysisDateTime(analysis.timestamp);
 
     return Card(
       margin: EdgeInsets.only(bottom: dims.spacingMd),

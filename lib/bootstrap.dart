@@ -18,11 +18,19 @@ import 'package:inksight/features/auth/presentation/viewmodels/auth_state_viewmo
 import 'package:inksight/features/settings/data/datasources/settings_local_data_source_impl.dart';
 import 'package:inksight/features/settings/data/repositories/settings_repository_impl.dart';
 import 'package:inksight/features/settings/presentation/viewmodels/theme_mode_viewmodel.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Future.wait([
+    initializeDateFormatting('en'),
+    initializeDateFormatting('es'),
+    initializeDateFormatting('fr'),
+  ]);
+
   await EasyLocalization.ensureInitialized();
 
   final supabaseUrl = AppEnv.supabaseUrl;

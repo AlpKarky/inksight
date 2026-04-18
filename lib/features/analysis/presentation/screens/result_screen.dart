@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inksight/app/router/routes.dart';
 import 'package:inksight/core/extensions/context_extensions.dart';
+import 'package:inksight/core/localization/localized_date_formatting.dart';
 import 'package:inksight/features/analysis/presentation/viewmodels/analysis_viewmodel.dart';
 import 'package:inksight/features/analysis/presentation/viewmodels/history_viewmodel.dart';
 import 'package:inksight/features/analysis/presentation/widgets/analysis_section_card.dart';
@@ -74,9 +75,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
               context.tr(
                 'analysis.completed_on',
                 namedArgs: {
-                  'date': DateFormat.yMMMd()
-                      .add_jm()
-                      .format(analysis.timestamp),
+                  'date': context.formatAnalysisDateTime(analysis.timestamp),
                 },
               ),
               style: context.appTextTheme.bodyMedium.copyWith(
