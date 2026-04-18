@@ -1,6 +1,6 @@
 # Settings Feature
 
-App preferences: **theme mode** (system / light / dark), **language** (en / es / fr via Easy Localization), and **profile** summary from auth state.
+App preferences: **theme mode** (system / light / dark), **language** (en / es / fr via Easy Localization), **profile** summary from auth state, and **sign out** (calls `AuthRepository.signOut`, confirmation dialog, `FailureMapper` on error).
 
 ## Structure
 

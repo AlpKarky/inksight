@@ -4,21 +4,67 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inksight/core/errors/result.dart';
 import 'package:inksight/core/extensions/context_extensions.dart';
 import 'package:inksight/features/auth/presentation/viewmodels/auth_state_viewmodel.dart';
 import 'package:inksight/features/settings/presentation/viewmodels/theme_mode_viewmodel.dart';
+import 'package:inksight/shared/presentation/failure_mapper.dart';
 
-class SettingsScreen extends ConsumerWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
+  @override
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   static const _supportedLocales = [
     Locale('en'),
     Locale('es'),
     Locale('fr'),
   ];
 
+  var _signingOut = false;
+
+  Future<void> _signOut(BuildContext context) async {
+    setState(() => _signingOut = true);
+    final repository = ref.read(authRepositoryProvider);
+    final result = await repository.signOut();
+    if (!context.mounted) return;
+    setState(() => _signingOut = false);
+    switch (result) {
+      case Success():
+        break;
+      case Failure(:final error):
+        context.showSnackBar(FailureMapper.toMessage(error, context));
+    }
+  }
+
+  Future<void> _onSignOutPressed(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(ctx.tr('settings.sign_out_confirm_title')),
+        content: Text(ctx.tr('settings.sign_out_confirm_message')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ctx.tr('common.cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(ctx.tr('settings.sign_out')),
+          ),
+        ],
+      ),
+    );
+    if ((confirmed ?? false) && context.mounted) {
+      await _signOut(context);
+    }
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final user = ref.watch(authStateViewModelProvider);
     final themeAsync = ref.watch(themeModeViewModelProvider);
     final dims = context.dimensions;
@@ -191,6 +237,46 @@ class SettingsScreen extends ConsumerWidget {
                     },
                   ),
                 ],
+              ),
+            ),
+          ),
+          SizedBox(height: dims.spacingXl),
+          Text(
+            context.tr('settings.account_section'),
+            style: context.appTextTheme.titleMedium.copyWith(
+              color: context.appColors.textSubtle,
+            ),
+          ),
+          SizedBox(height: dims.spacingSm),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              icon: _signingOut
+                  ? SizedBox(
+                      width: context.dimensions.iconMd,
+                      height: context.dimensions.iconMd,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    )
+                  : Icon(
+                      Icons.logout,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+              label: Text(context.tr('settings.sign_out')),
+              onPressed: _signingOut
+                  ? null
+                  : () => _onSignOutPressed(context),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.error,
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: dims.spacingLg,
+                  vertical: dims.spacingMd,
+                ),
               ),
             ),
           ),

@@ -87,6 +87,10 @@
     "language_label": "Langue de l'application",
     "language_en": "Anglais",
     "language_es": "Espagnol",
-    "language_fr": "Français"
+    "language_fr": "Français",
+    "account_section": "Compte",
+    "sign_out": "Se déconnecter",
+    "sign_out_confirm_title": "Déconnexion",
+    "sign_out_confirm_message": "Voulez-vous vraiment vous déconnecter ?"
   }
 }

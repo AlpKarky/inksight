@@ -87,6 +87,10 @@
     "language_label": "App language",
     "language_en": "English",
     "language_es": "Spanish",
-    "language_fr": "French"
+    "language_fr": "French",
+    "account_section": "Account",
+    "sign_out": "Sign out",
+    "sign_out_confirm_title": "Sign out",
+    "sign_out_confirm_message": "Are you sure you want to sign out?"
   }
 }

@@ -87,6 +87,10 @@
     "language_label": "Idioma de la app",
     "language_en": "Inglés",
     "language_es": "Español",
-    "language_fr": "Francés"
+    "language_fr": "Francés",
+    "account_section": "Cuenta",
+    "sign_out": "Cerrar sesión",
+    "sign_out_confirm_title": "Cerrar sesión",
+    "sign_out_confirm_message": "¿Seguro que quieres cerrar sesión?"
   }
 }
