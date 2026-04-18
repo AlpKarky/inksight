@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:inksight/core/errors/failures.dart';
 import 'package:inksight/core/errors/result.dart';
+import 'package:inksight/features/analysis/domain/analysis_pipeline_phase.dart';
 import 'package:inksight/features/analysis/domain/entities/analysis_entity.dart';
 import 'package:inksight/features/analysis/domain/repositories/analysis_repository.dart';
 import 'package:inksight/features/analysis/presentation/viewmodels/analysis_viewmodel.dart';
@@ -34,6 +35,10 @@ void main() {
     ),
   );
 
+  setUpAll(() {
+    registerFallbackValue((AnalysisPipelinePhase _) {});
+  });
+
   setUp(() {
     mockRepository = MockAnalysisRepository();
     mockFile = MockFile();
@@ -61,7 +66,10 @@ void main() {
 
     test('analyzeHandwriting sets AsyncData on success', () async {
       when(
-        () => mockRepository.analyzeHandwriting(any()),
+        () => mockRepository.analyzeHandwriting(
+          any(),
+          onPipelinePhase: any(named: 'onPipelinePhase'),
+        ),
       ).thenAnswer((_) async => Success(testEntity));
 
       final notifier = container.read(
@@ -77,7 +85,10 @@ void main() {
 
     test('analyzeHandwriting sets AsyncError on failure', () async {
       when(
-        () => mockRepository.analyzeHandwriting(any()),
+        () => mockRepository.analyzeHandwriting(
+          any(),
+          onPipelinePhase: any(named: 'onPipelinePhase'),
+        ),
       ).thenAnswer(
         (_) async => const Failure(AnalysisRemoteFailure()),
       );
@@ -95,7 +106,10 @@ void main() {
 
     test('clearResult resets state to null', () async {
       when(
-        () => mockRepository.analyzeHandwriting(any()),
+        () => mockRepository.analyzeHandwriting(
+          any(),
+          onPipelinePhase: any(named: 'onPipelinePhase'),
+        ),
       ).thenAnswer((_) async => Success(testEntity));
 
       final notifier = container.read(

@@ -34,4 +34,8 @@ abstract final class DebugMessages {
       'Invalid or missing Gemini API key.';
   static const analysisQuotaExceeded =
       'API quota exceeded. Try again later.';
+  static const analysisImageDecodeFailed =
+      'Could not read this image. Try another photo.';
+  static const analysisImageTooLarge =
+      'Image is still too large after compression. Try a smaller photo.';
 }

@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image/image.dart' as img;
 import 'package:inksight/core/errors/failures.dart';
 import 'package:inksight/core/errors/result.dart';
 import 'package:inksight/features/analysis/data/datasources/analysis_remote_data_source.dart';
@@ -11,9 +13,18 @@ import 'package:mocktail/mocktail.dart';
 class MockAnalysisRemoteDataSource extends Mock
     implements AnalysisRemoteDataSource {}
 
-class FakeFile extends Fake implements File {
+Uint8List _tinyJpegBytes() {
+  final image = img.Image(width: 2, height: 2);
+  img.fill(image, color: img.ColorRgb8(255, 255, 255));
+  return Uint8List.fromList(img.encodeJpg(image));
+}
+
+class FakeImageFile extends Fake implements File {
   @override
   String get path => '/test/image.jpg';
+
+  @override
+  Future<Uint8List> readAsBytes() async => _tinyJpegBytes();
 }
 
 void main() {
@@ -22,7 +33,7 @@ void main() {
   late File fakeFile;
 
   setUpAll(() {
-    registerFallbackValue(FakeFile());
+    registerFallbackValue(FakeImageFile());
   });
 
   setUp(() {
@@ -30,7 +41,7 @@ void main() {
     repository = AnalysisRepositoryImpl(
       remoteDataSource: mockDataSource,
     );
-    fakeFile = FakeFile();
+    fakeFile = FakeImageFile();
   });
 
   group('analyzeHandwriting', () {
@@ -68,6 +79,22 @@ void main() {
         (result as Failure<AnalysisEntity>).error,
         isA<AnalysisRemoteFailure>(),
       );
+    });
+
+    test('invokes onPipelinePhase with preparing then analyzing', () async {
+      when(
+        () => mockDataSource.analyzeHandwriting(
+          imageFile: any(named: 'imageFile'),
+        ),
+      ).thenAnswer((_) async => rawResponse);
+
+      final phases = <String>[];
+      await repository.analyzeHandwriting(
+        fakeFile,
+        onPipelinePhase: (phase) => phases.add(phase.name),
+      );
+
+      expect(phases, ['preparing', 'analyzing']);
     });
   });
 }

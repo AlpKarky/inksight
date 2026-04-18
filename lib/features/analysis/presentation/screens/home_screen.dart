@@ -10,6 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:inksight/app/router/routes.dart';
 import 'package:inksight/core/errors/failures.dart';
 import 'package:inksight/core/extensions/context_extensions.dart';
+import 'package:inksight/features/analysis/domain/analysis_pipeline_phase.dart';
+import 'package:inksight/features/analysis/presentation/viewmodels/analysis_pipeline_phase_viewmodel.dart';
 import 'package:inksight/features/analysis/presentation/viewmodels/analysis_viewmodel.dart';
 import 'package:inksight/features/analysis/presentation/widgets/image_picker_section.dart';
 import 'package:inksight/shared/presentation/failure_mapper.dart';
@@ -72,7 +74,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(analysisViewModelProvider);
+    final pipelinePhase = ref.watch(analysisPipelinePhaseProvider);
     final dims = context.dimensions;
+
+    final loadingMessage = state.isLoading
+        ? switch (pipelinePhase) {
+            AnalysisPipelinePhase.preparing =>
+                context.tr('analysis.preparing_image'),
+            AnalysisPipelinePhase.analyzing =>
+                context.tr('analysis.analyzing'),
+            AnalysisPipelinePhase.idle =>
+                context.tr('analysis.preparing_image'),
+          }
+        : null;
 
     ref.listen(analysisViewModelProvider, (_, next) {
       if (next.hasError && next.error is AppFailure) {
@@ -91,7 +105,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return LoadingOverlay(
       isLoading: state.isLoading,
-      message: context.tr('analysis.analyzing'),
+      message: loadingMessage,
       child: Scaffold(
         appBar: AppBar(
           title: Text(context.tr('app.name')),

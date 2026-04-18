@@ -24,6 +24,7 @@
     "gallery": "Galería",
     "crop_title": "Recortar imagen",
     "analyze_button": "Analizar escritura",
+    "preparing_image": "Preparando imagen…",
     "analyzing": "Analizando escritura...",
     "results_title": "Resultados del análisis",
     "no_results": "No hay resultados de análisis disponibles.",
@@ -54,7 +55,9 @@
     "unknown": "Ha ocurrido un error inesperado.",
     "analysis_failed": "No se pudo analizar la escritura. Inténtalo de nuevo.",
     "analysis_parse": "No se pudo interpretar el análisis. Prueba con otra imagen.",
-    "analysis_no_image": "Selecciona una imagen primero."
+    "analysis_no_image": "Selecciona una imagen primero.",
+    "analysis_image_decode": "No se pudo leer esta imagen. Prueba con otra foto.",
+    "analysis_image_too_large": "La imagen sigue siendo demasiado grande. Prueba con una foto más pequeña o de menor resolución."
   },
   "validation": {
     "email_required": "El correo es obligatorio.",

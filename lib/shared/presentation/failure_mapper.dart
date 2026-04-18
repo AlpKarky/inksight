@@ -26,6 +26,8 @@ abstract final class FailureMapper {
       AnalysisRemoteFailure() => 'errors.analysis_failed',
       AnalysisParseFailure() => 'errors.analysis_parse',
       AnalysisNoImageFailure() => 'errors.analysis_no_image',
+      AnalysisImageDecodeFailure() => 'errors.analysis_image_decode',
+      AnalysisImageTooLargeFailure() => 'errors.analysis_image_too_large',
     };
     return context.tr(key);
   }

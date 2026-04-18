@@ -24,6 +24,7 @@
     "gallery": "Gallery",
     "crop_title": "Crop Image",
     "analyze_button": "Analyze Handwriting",
+    "preparing_image": "Preparing image…",
     "analyzing": "Analyzing handwriting...",
     "results_title": "Analysis Results",
     "no_results": "No analysis results available.",
@@ -54,7 +55,9 @@
     "unknown": "An unexpected error occurred.",
     "analysis_failed": "Failed to analyze handwriting. Please try again.",
     "analysis_parse": "Could not parse the analysis. Please try a different image.",
-    "analysis_no_image": "Please select an image first."
+    "analysis_no_image": "Please select an image first.",
+    "analysis_image_decode": "Could not read this image. Try another photo.",
+    "analysis_image_too_large": "This image is still too large. Try a smaller or lower-resolution photo."
   },
   "validation": {
     "email_required": "Email is required.",

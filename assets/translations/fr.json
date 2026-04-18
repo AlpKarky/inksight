@@ -24,6 +24,7 @@
     "gallery": "Galerie",
     "crop_title": "Recadrer l'image",
     "analyze_button": "Analyser l'écriture",
+    "preparing_image": "Préparation de l'image…",
     "analyzing": "Analyse de l'écriture...",
     "results_title": "Résultats de l'analyse",
     "no_results": "Aucun résultat d'analyse disponible.",
@@ -54,7 +55,9 @@
     "unknown": "Une erreur inattendue s'est produite.",
     "analysis_failed": "Impossible d'analyser l'écriture. Réessayez.",
     "analysis_parse": "Impossible d'analyser le résultat. Essayez une autre image.",
-    "analysis_no_image": "Veuillez d'abord sélectionner une image."
+    "analysis_no_image": "Veuillez d'abord sélectionner une image.",
+    "analysis_image_decode": "Impossible de lire cette image. Essayez une autre photo.",
+    "analysis_image_too_large": "L'image est encore trop volumineuse. Essayez une photo plus petite ou en plus basse résolution."
   },
   "validation": {
     "email_required": "L'e-mail est obligatoire.",

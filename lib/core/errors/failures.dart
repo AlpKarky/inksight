@@ -158,3 +158,19 @@ final class AnalysisNoImageFailure extends AnalysisFailure {
     super.stackTrace,
   });
 }
+
+final class AnalysisImageDecodeFailure extends AnalysisFailure {
+  const AnalysisImageDecodeFailure({
+    super.message = DebugMessages.analysisImageDecodeFailed,
+    super.cause,
+    super.stackTrace,
+  });
+}
+
+final class AnalysisImageTooLargeFailure extends AnalysisFailure {
+  const AnalysisImageTooLargeFailure({
+    super.message = DebugMessages.analysisImageTooLarge,
+    super.cause,
+    super.stackTrace,
+  });
+}

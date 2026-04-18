@@ -1,9 +1,13 @@
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:typed_data';
 
 import 'package:inksight/core/errors/failures.dart';
 import 'package:inksight/core/errors/result.dart';
 import 'package:inksight/features/analysis/data/datasources/analysis_remote_data_source.dart';
 import 'package:inksight/features/analysis/data/models/analysis_model.dart';
+import 'package:inksight/features/analysis/data/utils/image_pipeline.dart';
+import 'package:inksight/features/analysis/domain/analysis_pipeline_phase.dart';
 import 'package:inksight/features/analysis/domain/entities/analysis_entity.dart';
 import 'package:inksight/features/analysis/domain/repositories/analysis_repository.dart';
 import 'package:uuid/uuid.dart';
@@ -20,27 +24,62 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
 
   @override
   Future<Result<AnalysisEntity>> analyzeHandwriting(
-    File imageFile,
-  ) async {
+    File imageFile, {
+    void Function(AnalysisPipelinePhase phase)? onPipelinePhase,
+  }) async {
     try {
-      final rawData = await _remoteDataSource.analyzeHandwriting(
-        imageFile: imageFile,
+      onPipelinePhase?.call(AnalysisPipelinePhase.preparing);
+      final rawBytes = await imageFile.readAsBytes();
+
+      late final Uint8List preparedBytes;
+      try {
+        preparedBytes =
+            await Isolate.run(() => prepareImageForAnalysisBytes(rawBytes));
+      } on FormatException catch (e, stackTrace) {
+        return Failure(
+          AnalysisImageDecodeFailure(cause: e, stackTrace: stackTrace),
+        );
+      } on ImageTooLargeForPipelineException catch (e, stackTrace) {
+        return Failure(
+          AnalysisImageTooLargeFailure(cause: e, stackTrace: stackTrace),
+        );
+      } on Object catch (e, stackTrace) {
+        return Failure(
+          AnalysisImageDecodeFailure(cause: e, stackTrace: stackTrace),
+        );
+      }
+
+      final tempFile = File(
+        '${Directory.systemTemp.path}'
+        '/inksight_analysis_${_uuid.v4()}.jpg',
       );
 
-      final model = AnalysisModel(
-        id: _uuid.v4(),
-        timestamp: DateTime.now(),
-        imagePath: imageFile.path,
-        personalityTraits:
-            rawData['personality_traits'] as Map<String, dynamic>,
-        legibilityAssessment:
-            rawData['legibility_assessment']
-                as Map<String, dynamic>,
-        emotionalState:
-            rawData['emotional_state'] as Map<String, dynamic>,
-      );
+      try {
+        await tempFile.writeAsBytes(preparedBytes);
+        onPipelinePhase?.call(AnalysisPipelinePhase.analyzing);
 
-      return Success(model.toDomain());
+        final rawData = await _remoteDataSource.analyzeHandwriting(
+          imageFile: tempFile,
+        );
+
+        final model = AnalysisModel(
+          id: _uuid.v4(),
+          timestamp: DateTime.now(),
+          imagePath: imageFile.path,
+          personalityTraits:
+              rawData['personality_traits'] as Map<String, dynamic>,
+          legibilityAssessment:
+              rawData['legibility_assessment'] as Map<String, dynamic>,
+          emotionalState:
+              rawData['emotional_state'] as Map<String, dynamic>,
+        );
+
+        return Success(model.toDomain());
+      } finally {
+        if (tempFile.existsSync()) {
+          await tempFile.delete();
+        }
+      }
     } on AppFailure catch (e) {
       return Failure(e);
     }
