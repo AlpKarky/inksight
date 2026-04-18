@@ -11,5 +11,6 @@ analyzer:
 
 linter:
   rules:
+    # Document domain + core/errors via nested analysis_options.yaml; see docs/architecture.md.
     public_member_api_docs: false
     one_member_abstracts: false

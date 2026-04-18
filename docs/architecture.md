@@ -85,6 +85,15 @@ feature/data/datasources/
 
 Lives in `shared/presentation/`. Maps `AppFailure` subtypes to localized strings. This is a presentation concern, not domain.
 
+### Public API documentation (dartdoc)
+
+The root `analysis_options.yaml` keeps `public_member_api_docs: false` for most of `lib/` (screens and widgets stay lightweight). Nested configs turn **`public_member_api_docs: true`** on for:
+
+- `lib/core/errors/` — `Result`, `AppFailure` hierarchy, and related types
+- each feature’s `domain/` — repository interfaces, entities, and shared enums
+
+That matches how many teams document **contracts** (domain + core errors) without requiring `///` on every widget. Run `dart doc` if you want HTML output for those layers.
+
 ## How to Add a New Feature
 
 1. Create `lib/features/<name>/` with `data/`, `domain/`, `presentation/` subdirectories

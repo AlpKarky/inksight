@@ -33,14 +33,15 @@ See [docs/architecture.md](docs/architecture.md) for the full architecture guide
 
 ### Prerequisites
 
-- Flutter SDK >= 3.6.1
-- A [Supabase](https://supabase.com) account and project
+- [Flutter](https://docs.flutter.dev/get-started/install) (**stable** channel matches [CI](.github/workflows/ci.yml))
+- **Dart SDK** `^3.8.0` as declared in [`pubspec.yaml`](pubspec.yaml) (`environment.sdk`)
+- A [Supabase](https://supabase.com) account and project (optional for local dev without cloud auth; see bootstrap)
 
 ### Setup
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/inksight.git
+   git clone https://github.com/AlpKarky/inksight.git
    cd inksight
    ```
 

@@ -1,14 +1,21 @@
 import 'package:inksight/core/constants/debug_messages.dart';
 
+/// Root type for recoverable app errors surfaced through repository results.
 sealed class AppFailure implements Exception {
+  /// Creates an [AppFailure] with a [message] and optional [cause] / [stackTrace].
   const AppFailure({
     required this.message,
     this.cause,
     this.stackTrace,
   });
 
+  /// Human-readable default; may be overridden per subtype.
   final String message;
+
+  /// Optional underlying exception or value for debugging.
   final Object? cause;
+
+  /// Optional stack trace when this failure wraps another error.
   final StackTrace? stackTrace;
 
   @override
@@ -17,7 +24,9 @@ sealed class AppFailure implements Exception {
 
 // -- Auth Failures --
 
+/// Base type for authentication-related failures.
 sealed class AuthFailure extends AppFailure {
+  /// Creates an [AuthFailure].
   const AuthFailure({
     required super.message,
     super.cause,
@@ -25,7 +34,9 @@ sealed class AuthFailure extends AppFailure {
   });
 }
 
+/// Credentials rejected or sign-in could not complete.
 final class AuthInvalidCredentialsFailure extends AuthFailure {
+  /// Creates an [AuthInvalidCredentialsFailure].
   const AuthInvalidCredentialsFailure({
     super.message = DebugMessages.invalidCredentials,
     super.cause,
@@ -33,7 +44,9 @@ final class AuthInvalidCredentialsFailure extends AuthFailure {
   });
 }
 
+/// Email already registered.
 final class AuthEmailInUseFailure extends AuthFailure {
+  /// Creates an [AuthEmailInUseFailure].
   const AuthEmailInUseFailure({
     super.message = DebugMessages.emailInUse,
     super.cause,
@@ -41,7 +54,9 @@ final class AuthEmailInUseFailure extends AuthFailure {
   });
 }
 
+/// Password does not meet policy.
 final class AuthWeakPasswordFailure extends AuthFailure {
+  /// Creates an [AuthWeakPasswordFailure].
   const AuthWeakPasswordFailure({
     super.message = DebugMessages.weakPassword,
     super.cause,
@@ -49,7 +64,9 @@ final class AuthWeakPasswordFailure extends AuthFailure {
   });
 }
 
+/// Session is no longer valid; user must sign in again.
 final class AuthSessionExpiredFailure extends AuthFailure {
+  /// Creates an [AuthSessionExpiredFailure].
   const AuthSessionExpiredFailure({
     super.message = DebugMessages.sessionExpired,
     super.cause,
@@ -57,7 +74,9 @@ final class AuthSessionExpiredFailure extends AuthFailure {
   });
 }
 
+/// Auth backend misconfiguration or unknown auth error.
 final class AuthUnknownFailure extends AuthFailure {
+  /// Creates an [AuthUnknownFailure].
   const AuthUnknownFailure({
     super.message = DebugMessages.authUnknown,
     super.cause,
@@ -67,7 +86,9 @@ final class AuthUnknownFailure extends AuthFailure {
 
 // -- Network Failures --
 
+/// Base type for connectivity and remote service failures.
 sealed class NetworkFailure extends AppFailure {
+  /// Creates a [NetworkFailure].
   const NetworkFailure({
     required super.message,
     super.cause,
@@ -75,7 +96,9 @@ sealed class NetworkFailure extends AppFailure {
   });
 }
 
+/// Device appears offline or request could not reach the network.
 final class NoConnectionFailure extends NetworkFailure {
+  /// Creates a [NoConnectionFailure].
   const NoConnectionFailure({
     super.message = DebugMessages.noConnection,
     super.cause,
@@ -83,7 +106,9 @@ final class NoConnectionFailure extends NetworkFailure {
   });
 }
 
+/// Server returned an error response.
 final class ServerFailure extends NetworkFailure {
+  /// Creates a [ServerFailure].
   const ServerFailure({
     super.message = DebugMessages.serverError,
     super.cause,
@@ -91,7 +116,9 @@ final class ServerFailure extends NetworkFailure {
   });
 }
 
+/// Request exceeded the allowed wait time.
 final class TimeoutFailure extends NetworkFailure {
+  /// Creates a [TimeoutFailure].
   const TimeoutFailure({
     super.message = DebugMessages.timeout,
     super.cause,
@@ -101,7 +128,9 @@ final class TimeoutFailure extends NetworkFailure {
 
 // -- Storage Failures --
 
+/// Base type for local persistence failures.
 sealed class StorageFailure extends AppFailure {
+  /// Creates a [StorageFailure].
   const StorageFailure({
     required super.message,
     super.cause,
@@ -109,7 +138,9 @@ sealed class StorageFailure extends AppFailure {
   });
 }
 
+/// Could not read from local storage.
 final class StorageReadFailure extends StorageFailure {
+  /// Creates a [StorageReadFailure].
   const StorageReadFailure({
     super.message = DebugMessages.storageRead,
     super.cause,
@@ -117,7 +148,9 @@ final class StorageReadFailure extends StorageFailure {
   });
 }
 
+/// Could not write to local storage.
 final class StorageWriteFailure extends StorageFailure {
+  /// Creates a [StorageWriteFailure].
   const StorageWriteFailure({
     super.message = DebugMessages.storageWrite,
     super.cause,
@@ -127,7 +160,9 @@ final class StorageWriteFailure extends StorageFailure {
 
 // -- Analysis Failures --
 
+/// Base type for handwriting analysis pipeline failures.
 sealed class AnalysisFailure extends AppFailure {
+  /// Creates an [AnalysisFailure].
   const AnalysisFailure({
     required super.message,
     super.cause,
@@ -135,7 +170,9 @@ sealed class AnalysisFailure extends AppFailure {
   });
 }
 
+/// Remote analysis API failed or returned an error.
 final class AnalysisRemoteFailure extends AnalysisFailure {
+  /// Creates an [AnalysisRemoteFailure].
   const AnalysisRemoteFailure({
     super.message = DebugMessages.analysisApiFailed,
     super.cause,
@@ -143,7 +180,9 @@ final class AnalysisRemoteFailure extends AnalysisFailure {
   });
 }
 
+/// Response body could not be parsed into structured analysis data.
 final class AnalysisParseFailure extends AnalysisFailure {
+  /// Creates an [AnalysisParseFailure].
   const AnalysisParseFailure({
     super.message = DebugMessages.analysisParseFailed,
     super.cause,
@@ -151,7 +190,9 @@ final class AnalysisParseFailure extends AnalysisFailure {
   });
 }
 
+/// User started analysis without selecting an image.
 final class AnalysisNoImageFailure extends AnalysisFailure {
+  /// Creates an [AnalysisNoImageFailure].
   const AnalysisNoImageFailure({
     super.message = DebugMessages.analysisNoImage,
     super.cause,
@@ -159,7 +200,9 @@ final class AnalysisNoImageFailure extends AnalysisFailure {
   });
 }
 
+/// Image bytes could not be decoded for processing.
 final class AnalysisImageDecodeFailure extends AnalysisFailure {
+  /// Creates an [AnalysisImageDecodeFailure].
   const AnalysisImageDecodeFailure({
     super.message = DebugMessages.analysisImageDecodeFailed,
     super.cause,
@@ -167,7 +210,9 @@ final class AnalysisImageDecodeFailure extends AnalysisFailure {
   });
 }
 
+/// Image could not be compressed within configured size limits.
 final class AnalysisImageTooLargeFailure extends AnalysisFailure {
+  /// Creates an [AnalysisImageTooLargeFailure].
   const AnalysisImageTooLargeFailure({
     super.message = DebugMessages.analysisImageTooLarge,
     super.cause,
