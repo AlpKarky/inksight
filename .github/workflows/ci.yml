@@ -20,6 +20,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # pubspec lists .env.* as assets; those files are gitignored locally. CI needs them so
+      # the analyzer does not report asset_does_not_exist (and images/ must exist).
+      - name: Placeholder env files and assets for analysis
+        run: |
+          cp .env.example .env.dev
+          cp .env.example .env.staging
+          cp .env.example .env.prod
+
       # Pin Flutter stable so local and CI use a predictable SDK (change channel if needed).
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
