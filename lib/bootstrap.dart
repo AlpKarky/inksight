@@ -101,6 +101,9 @@ Future<void> bootstrap() async {
       ],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
+      // Disable Riverpod async-provider auto-retry (null = no retry). Global
+      // retries would hit auth + Gemini paths unpredictably; prefer explicit
+      // UI/VM retry or datasource-level backoff for idempotent reads only.
       child: ProviderScope(
         retry: (retryCount, error) => null,
         overrides: overrides,

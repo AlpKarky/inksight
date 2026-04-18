@@ -94,6 +94,14 @@ The root `analysis_options.yaml` keeps `public_member_api_docs: false` for most 
 
 That matches how many teams document **contracts** (domain + core errors) without requiring `///` on every widget. Run `dart doc` if you want HTML output for those layers.
 
+### `ProviderScope.retry` (no automatic retries)
+
+`bootstrap.dart` passes `retry: (_, __) => null` so Riverpod does **not** automatically retry failed **async** providers for the whole app. Returning `null` means “do not schedule another attempt.”
+
+**Why:** One global policy applies to every async provider under the scope. InkSight mixes **auth** and **remote analysis**—both are poor fits for blind retries (duplicated work, rate limits, confusing UX). Failures are surfaced once; recovery is **explicit** (user action / ViewModel) or can be implemented inside a **data source** for safe, idempotent reads with backoff.
+
+**Reconsider if:** You introduce a subtree or provider category where **only** cacheable GET-style work runs and you want exponential backoff—then prefer **scoped** retry or **per-call** retry in the datasource rather than a blanket `Duration` at `ProviderScope` without auditing all async providers.
+
 ## How to Add a New Feature
 
 1. Create `lib/features/<name>/` with `data/`, `domain/`, `presentation/` subdirectories
