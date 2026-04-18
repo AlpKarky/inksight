@@ -128,8 +128,9 @@ void main() {
     });
 
     test('returns Failure when sign out fails', () async {
-      when(() => mockDataSource.signOut())
-          .thenThrow(const AuthUnknownFailure());
+      when(
+        () => mockDataSource.signOut(),
+      ).thenThrow(const AuthUnknownFailure());
 
       final result = await repository.signOut();
 

@@ -6,7 +6,7 @@ import 'package:inksight/features/auth/domain/repositories/auth_repository.dart'
 
 class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({required AuthRemoteDataSource dataSource})
-      : _dataSource = dataSource;
+    : _dataSource = dataSource;
 
   final AuthRemoteDataSource _dataSource;
 
@@ -54,8 +54,9 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Stream<UserEntity?> get authStateChanges {
-    return _dataSource.authStateChanges
-        .map((userModel) => userModel?.toDomain());
+    return _dataSource.authStateChanges.map(
+      (userModel) => userModel?.toDomain(),
+    );
   }
 
   @override

@@ -41,7 +41,8 @@ void main() {
     });
 
     test('strips markdown code blocks', () {
-      const raw = '```json\n'
+      const raw =
+          '```json\n'
           '{"personality_traits": {"a": 1}, '
           '"legibility_assessment": {"b": 2}, '
           '"emotional_state": {"c": 3}}'

@@ -16,8 +16,8 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
   AnalysisRepositoryImpl({
     required AnalysisRemoteDataSource remoteDataSource,
     Uuid? uuid,
-  })  : _remoteDataSource = remoteDataSource,
-        _uuid = uuid ?? const Uuid();
+  }) : _remoteDataSource = remoteDataSource,
+       _uuid = uuid ?? const Uuid();
 
   final AnalysisRemoteDataSource _remoteDataSource;
   final Uuid _uuid;
@@ -33,8 +33,9 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
 
       late final Uint8List preparedBytes;
       try {
-        preparedBytes =
-            await Isolate.run(() => prepareImageForAnalysisBytes(rawBytes));
+        preparedBytes = await Isolate.run(
+          () => prepareImageForAnalysisBytes(rawBytes),
+        );
       } on FormatException catch (e, stackTrace) {
         return Failure(
           AnalysisImageDecodeFailure(cause: e, stackTrace: stackTrace),
@@ -70,8 +71,7 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
               rawData['personality_traits'] as Map<String, dynamic>,
           legibilityAssessment:
               rawData['legibility_assessment'] as Map<String, dynamic>,
-          emotionalState:
-              rawData['emotional_state'] as Map<String, dynamic>,
+          emotionalState: rawData['emotional_state'] as Map<String, dynamic>,
         );
 
         return Success(model.toDomain());

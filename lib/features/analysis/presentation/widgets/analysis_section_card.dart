@@ -169,8 +169,9 @@ class _DataContent extends StatelessWidget {
                 children: [
                   Text(
                     '${_formatKey(e.key.toString())}: ',
-                    style: context.appTextTheme.bodyMedium
-                        .copyWith(fontWeight: FontWeight.w500),
+                    style: context.appTextTheme.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   Expanded(
                     child: Text(
@@ -235,9 +236,7 @@ class _DataContent extends StatelessWidget {
         .replaceAll('_', ' ')
         .split(' ')
         .map(
-          (w) => w.isNotEmpty
-              ? '${w[0].toUpperCase()}${w.substring(1)}'
-              : '',
+          (w) => w.isNotEmpty ? '${w[0].toUpperCase()}${w.substring(1)}' : '',
         )
         .join(' ');
   }

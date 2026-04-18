@@ -10,8 +10,7 @@ import 'package:inksight/features/analysis/domain/repositories/analysis_reposito
 import 'package:inksight/features/analysis/presentation/viewmodels/analysis_viewmodel.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockAnalysisRepository extends Mock
-    implements AnalysisRepository {}
+class MockAnalysisRepository extends Mock implements AnalysisRepository {}
 
 class MockFile extends Mock implements File {}
 
@@ -45,8 +44,7 @@ void main() {
 
     container = ProviderContainer(
       overrides: [
-        analysisRepositoryProvider
-            .overrideWithValue(mockRepository),
+        analysisRepositoryProvider.overrideWithValue(mockRepository),
       ],
     );
 
@@ -117,21 +115,17 @@ void main() {
       );
 
       await notifier.analyzeHandwriting(mockFile);
-      final beforeClear =
-          container.read(analysisViewModelProvider);
+      final beforeClear = container.read(analysisViewModelProvider);
       expect(beforeClear.value, isNotNull);
 
       notifier.clearResult();
 
-      final afterClear =
-          container.read(analysisViewModelProvider);
+      final afterClear = container.read(analysisViewModelProvider);
       expect(afterClear.value, isNull);
     });
 
     test('setResult directly sets analysis', () {
-      container
-          .read(analysisViewModelProvider.notifier)
-          .setResult(testEntity);
+      container.read(analysisViewModelProvider.notifier).setResult(testEntity);
 
       final state = container.read(analysisViewModelProvider);
       expect(state.value?.id, '1');

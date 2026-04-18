@@ -9,7 +9,7 @@ import 'package:inksight/features/auth/data/models/user_model.dart';
 /// with a short delay to mimic network latency.
 class AuthLocalDataSource implements AuthRemoteDataSource {
   AuthLocalDataSource()
-      : _authController = StreamController<UserModel?>.broadcast();
+    : _authController = StreamController<UserModel?>.broadcast();
 
   final StreamController<UserModel?> _authController;
   UserModel? _currentUser;

@@ -35,7 +35,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _onSignIn() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    await ref.read(loginViewModelProvider.notifier).signIn(
+    await ref
+        .read(loginViewModelProvider.notifier)
+        .signIn(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );

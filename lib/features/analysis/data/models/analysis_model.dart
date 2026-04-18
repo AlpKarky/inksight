@@ -40,8 +40,7 @@ abstract class AnalysisModel with _$AnalysisModel {
       timestamp: timestamp,
       imagePath: imagePath,
       personalityTraits: PersonalityTraits(data: personalityTraits),
-      legibilityAssessment:
-          LegibilityAssessment(data: legibilityAssessment),
+      legibilityAssessment: LegibilityAssessment(data: legibilityAssessment),
       emotionalState: EmotionalState(data: emotionalState),
     );
   }

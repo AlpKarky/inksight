@@ -23,8 +23,7 @@ class HistoryScreen extends ConsumerWidget {
         title: Text(context.tr('analysis.history')),
       ),
       body: state.when(
-        loading: () =>
-            const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) => _ErrorState(
           error: error,
           onRetry: () => ref.invalidate(historyViewModelProvider),
@@ -122,9 +121,7 @@ class _AnalysisList extends ConsumerWidget {
         return _AnalysisCard(
           analysis: analysis,
           onTap: () async {
-            ref
-                .read(analysisViewModelProvider.notifier)
-                .setResult(analysis);
+            ref.read(analysisViewModelProvider.notifier).setResult(analysis);
             await context.push<void>(Routes.result);
           },
           onDelete: () async {

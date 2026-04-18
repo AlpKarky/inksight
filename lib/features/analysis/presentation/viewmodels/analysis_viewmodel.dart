@@ -30,9 +30,7 @@ class AnalysisViewModel extends _$AnalysisViewModel {
         imageFile,
         onPipelinePhase: (phase) {
           if (ref.mounted) {
-            ref
-                .read(analysisPipelinePhaseProvider.notifier)
-                .state = phase;
+            ref.read(analysisPipelinePhaseProvider.notifier).state = phase;
           }
         },
       );

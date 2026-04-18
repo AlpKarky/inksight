@@ -13,16 +13,16 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
   static const _themeModeKey = 'inksight_settings_theme_mode';
 
   static int _encode(ThemeMode mode) => switch (mode) {
-        ThemeMode.system => 0,
-        ThemeMode.light => 1,
-        ThemeMode.dark => 2,
-      };
+    ThemeMode.system => 0,
+    ThemeMode.light => 1,
+    ThemeMode.dark => 2,
+  };
 
   static ThemeMode _decode(int? value) => switch (value) {
-        1 => ThemeMode.light,
-        2 => ThemeMode.dark,
-        _ => ThemeMode.system,
-      };
+    1 => ThemeMode.light,
+    2 => ThemeMode.dark,
+    _ => ThemeMode.system,
+  };
 
   @override
   Future<ThemeMode> getThemeMode() async {

@@ -264,9 +264,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       color: Theme.of(context).colorScheme.error,
                     ),
               label: Text(context.tr('settings.sign_out')),
-              onPressed: _signingOut
-                  ? null
-                  : () => _onSignOutPressed(context),
+              onPressed: _signingOut ? null : () => _onSignOutPressed(context),
               style: OutlinedButton.styleFrom(
                 foregroundColor: Theme.of(context).colorScheme.error,
                 side: BorderSide(

@@ -12,9 +12,9 @@ class GeminiDataSourceImpl implements AnalysisRemoteDataSource {
     required String apiKey,
     required AnalysisResponseParser parser,
     http.Client? httpClient,
-  })  : _apiKey = apiKey,
-        _parser = parser,
-        _httpClient = httpClient ?? http.Client();
+  }) : _apiKey = apiKey,
+       _parser = parser,
+       _httpClient = httpClient ?? http.Client();
 
   final String _apiKey;
   final AnalysisResponseParser _parser;
@@ -71,13 +71,13 @@ class GeminiDataSourceImpl implements AnalysisRemoteDataSource {
             {
               'text':
                   'Analyze this handwriting sample and provide insights '
-                      'about: 1. Personality traits based on handwriting '
-                      'style, 2. Legibility assessment, '
-                      '3. Emotional state detection. '
-                      'Return the analysis as a JSON object with these '
-                      'three categories as keys. Do not include any '
-                      'markdown formatting or code blocks in your '
-                      'response, just the raw JSON.',
+                  'about: 1. Personality traits based on handwriting '
+                  'style, 2. Legibility assessment, '
+                  '3. Emotional state detection. '
+                  'Return the analysis as a JSON object with these '
+                  'three categories as keys. Do not include any '
+                  'markdown formatting or code blocks in your '
+                  'response, just the raw JSON.',
             },
             {
               'inlineData': {
@@ -127,10 +127,8 @@ class GeminiDataSourceImpl implements AnalysisRemoteDataSource {
       );
     }
 
-    final firstCandidate =
-        candidates.first as Map<String, dynamic>;
-    final content =
-        firstCandidate['content'] as Map<String, dynamic>?;
+    final firstCandidate = candidates.first as Map<String, dynamic>;
+    final content = firstCandidate['content'] as Map<String, dynamic>?;
     final parts = content?['parts'] as List<dynamic>?;
 
     if (parts == null || parts.isEmpty) {
@@ -153,15 +151,12 @@ class GeminiDataSourceImpl implements AnalysisRemoteDataSource {
 
   AppFailure _mapApiError(http.Response response) {
     try {
-      final body =
-          jsonDecode(response.body) as Map<String, dynamic>;
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
       final apiMessage =
-          (body['error'] as Map<String, dynamic>?)?['message']
-                  ?.toString() ??
-              'Status ${response.statusCode}';
+          (body['error'] as Map<String, dynamic>?)?['message']?.toString() ??
+          'Status ${response.statusCode}';
 
-      if (response.statusCode == 401 ||
-          response.statusCode == 403) {
+      if (response.statusCode == 401 || response.statusCode == 403) {
         return AnalysisRemoteFailure(
           message: DebugMessages.analysisInvalidApiKey,
           cause: apiMessage,

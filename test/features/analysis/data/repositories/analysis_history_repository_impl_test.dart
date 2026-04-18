@@ -45,21 +45,22 @@ void main() {
 
   group('getSavedAnalyses', () {
     test('returns Success with sorted list', () async {
-      when(() => mockLocalDataSource.getSavedAnalyses())
-          .thenAnswer((_) async => [testModel]);
+      when(
+        () => mockLocalDataSource.getSavedAnalyses(),
+      ).thenAnswer((_) async => [testModel]);
 
       final result = await repository.getSavedAnalyses();
 
       expect(result, isA<Success<List<AnalysisEntity>>>());
-      final data =
-          (result as Success<List<AnalysisEntity>>).data;
+      final data = (result as Success<List<AnalysisEntity>>).data;
       expect(data, hasLength(1));
       expect(data.first.id, '1');
     });
 
     test('returns Failure when data source throws', () async {
-      when(() => mockLocalDataSource.getSavedAnalyses())
-          .thenThrow(const StorageReadFailure());
+      when(
+        () => mockLocalDataSource.getSavedAnalyses(),
+      ).thenThrow(const StorageReadFailure());
 
       final result = await repository.getSavedAnalyses();
 
@@ -69,20 +70,21 @@ void main() {
 
   group('saveAnalysis', () {
     test('returns Success on successful save', () async {
-      when(() => mockLocalDataSource.saveAnalysis(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockLocalDataSource.saveAnalysis(any()),
+      ).thenAnswer((_) async {});
 
       final entity = testModel.toDomain();
       final result = await repository.saveAnalysis(entity);
 
       expect(result, isA<Success<void>>());
-      verify(() => mockLocalDataSource.saveAnalysis(any()))
-          .called(1);
+      verify(() => mockLocalDataSource.saveAnalysis(any())).called(1);
     });
 
     test('returns Failure when save fails', () async {
-      when(() => mockLocalDataSource.saveAnalysis(any()))
-          .thenThrow(const StorageWriteFailure());
+      when(
+        () => mockLocalDataSource.saveAnalysis(any()),
+      ).thenThrow(const StorageWriteFailure());
 
       final entity = testModel.toDomain();
       final result = await repository.saveAnalysis(entity);
@@ -93,8 +95,9 @@ void main() {
 
   group('deleteAnalysis', () {
     test('returns Success on successful delete', () async {
-      when(() => mockLocalDataSource.deleteAnalysis(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockLocalDataSource.deleteAnalysis(any()),
+      ).thenAnswer((_) async {});
 
       final result = await repository.deleteAnalysis('1');
 
@@ -102,8 +105,9 @@ void main() {
     });
 
     test('returns Failure when delete fails', () async {
-      when(() => mockLocalDataSource.deleteAnalysis(any()))
-          .thenThrow(const StorageWriteFailure());
+      when(
+        () => mockLocalDataSource.deleteAnalysis(any()),
+      ).thenThrow(const StorageWriteFailure());
 
       final result = await repository.deleteAnalysis('1');
 

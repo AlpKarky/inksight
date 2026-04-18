@@ -35,7 +35,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   Future<void> _onSignUp() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    await ref.read(signUpViewModelProvider.notifier).signUp(
+    await ref
+        .read(signUpViewModelProvider.notifier)
+        .signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );

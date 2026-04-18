@@ -23,8 +23,9 @@ void main() {
   setUp(() {
     mockRepository = MockAuthRepository();
     when(() => mockRepository.currentUser).thenReturn(null);
-    when(() => mockRepository.authStateChanges)
-        .thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockRepository.authStateChanges,
+    ).thenAnswer((_) => const Stream.empty());
 
     container = ProviderContainer(
       overrides: [

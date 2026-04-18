@@ -6,14 +6,11 @@ abstract final class DebugMessages {
   static const invalidCredentials = 'Invalid email or password.';
   static const emailInUse = 'This email is already in use.';
   static const weakPassword = 'The password is too weak.';
-  static const sessionExpired =
-      'Session expired. Please sign in again.';
-  static const authUnknown =
-      'An unknown authentication error occurred.';
+  static const sessionExpired = 'Session expired. Please sign in again.';
+  static const authUnknown = 'An unknown authentication error occurred.';
   static const authNotConfigured =
       'Auth not configured. Set Supabase credentials in .env.';
-  static const signUpNoUser =
-      'Sign up succeeded but no user was returned.';
+  static const signUpNoUser = 'Sign up succeeded but no user was returned.';
 
   // Network
   static const noConnection = 'No internet connection.';
@@ -25,15 +22,11 @@ abstract final class DebugMessages {
   static const storageWrite = 'Failed to write to storage.';
 
   // Analysis
-  static const analysisApiFailed =
-      'Failed to analyze handwriting via API.';
-  static const analysisParseFailed =
-      'Failed to parse analysis response.';
+  static const analysisApiFailed = 'Failed to analyze handwriting via API.';
+  static const analysisParseFailed = 'Failed to parse analysis response.';
   static const analysisNoImage = 'No image selected for analysis.';
-  static const analysisInvalidApiKey =
-      'Invalid or missing Gemini API key.';
-  static const analysisQuotaExceeded =
-      'API quota exceeded. Try again later.';
+  static const analysisInvalidApiKey = 'Invalid or missing Gemini API key.';
+  static const analysisQuotaExceeded = 'API quota exceeded. Try again later.';
   static const analysisImageDecodeFailed =
       'Could not read this image. Try another photo.';
   static const analysisImageTooLarge =

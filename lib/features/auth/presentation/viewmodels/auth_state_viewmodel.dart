@@ -44,23 +44,21 @@ class _NoOpAuthRepository implements AuthRepository {
   Future<Result<UserEntity>> signIn({
     required String email,
     required String password,
-  }) async =>
-      const Failure(
-        AuthUnknownFailure(
-          message: DebugMessages.authNotConfigured,
-        ),
-      );
+  }) async => const Failure(
+    AuthUnknownFailure(
+      message: DebugMessages.authNotConfigured,
+    ),
+  );
 
   @override
   Future<Result<UserEntity>> signUp({
     required String email,
     required String password,
-  }) async =>
-      const Failure(
-        AuthUnknownFailure(
-          message: DebugMessages.authNotConfigured,
-        ),
-      );
+  }) async => const Failure(
+    AuthUnknownFailure(
+      message: DebugMessages.authNotConfigured,
+    ),
+  );
 
   @override
   Future<Result<void>> signOut() async => const Failure(

@@ -59,13 +59,11 @@ void main() {
 
       container = ProviderContainer(
         overrides: [
-          analysisHistoryRepositoryProvider
-              .overrideWithValue(mockRepository),
+          analysisHistoryRepositoryProvider.overrideWithValue(mockRepository),
         ],
       );
 
-      await container
-          .read(historyViewModelProvider.future);
+      await container.read(historyViewModelProvider.future);
 
       final state = container.read(historyViewModelProvider);
       expect(state.value, hasLength(2));
@@ -78,16 +76,18 @@ void main() {
         (_) async => const Failure(StorageReadFailure()),
       );
 
-      container = ProviderContainer(
-        retry: (retryCount, error) => null,
-        overrides: [
-          analysisHistoryRepositoryProvider
-              .overrideWithValue(mockRepository),
-        ],
-      )..listen(
-          historyViewModelProvider,
-          (previous, next) {},
-        );
+      container =
+          ProviderContainer(
+            retry: (retryCount, error) => null,
+            overrides: [
+              analysisHistoryRepositoryProvider.overrideWithValue(
+                mockRepository,
+              ),
+            ],
+          )..listen(
+            historyViewModelProvider,
+            (previous, next) {},
+          );
 
       // Let microtasks settle (async build).
       await Future<void>.delayed(Duration.zero);
@@ -111,13 +111,11 @@ void main() {
 
       container = ProviderContainer(
         overrides: [
-          analysisHistoryRepositoryProvider
-              .overrideWithValue(mockRepository),
+          analysisHistoryRepositoryProvider.overrideWithValue(mockRepository),
         ],
       );
 
-      await container
-          .read(historyViewModelProvider.future);
+      await container.read(historyViewModelProvider.future);
 
       await container
           .read(historyViewModelProvider.notifier)
@@ -140,13 +138,11 @@ void main() {
 
       container = ProviderContainer(
         overrides: [
-          analysisHistoryRepositoryProvider
-              .overrideWithValue(mockRepository),
+          analysisHistoryRepositoryProvider.overrideWithValue(mockRepository),
         ],
       );
 
-      await container
-          .read(historyViewModelProvider.future);
+      await container.read(historyViewModelProvider.future);
 
       await container
           .read(historyViewModelProvider.notifier)

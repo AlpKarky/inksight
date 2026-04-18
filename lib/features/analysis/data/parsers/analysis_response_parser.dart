@@ -35,10 +35,7 @@ class AnalysisResponseParser {
   }
 
   String _cleanJsonResponse(String text) {
-    return text
-        .replaceAll('```json', '')
-        .replaceAll('```', '')
-        .trim();
+    return text.replaceAll('```json', '').replaceAll('```', '').trim();
   }
 
   Map<String, dynamic> _standardizeKeys(Map<String, dynamic> data) {

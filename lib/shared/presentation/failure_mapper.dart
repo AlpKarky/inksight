@@ -9,8 +9,7 @@ abstract final class FailureMapper {
   ) {
     final key = switch (failure) {
       // Auth
-      AuthInvalidCredentialsFailure() =>
-        'errors.invalid_credentials',
+      AuthInvalidCredentialsFailure() => 'errors.invalid_credentials',
       AuthEmailInUseFailure() => 'errors.email_in_use',
       AuthWeakPasswordFailure() => 'errors.weak_password',
       AuthSessionExpiredFailure() => 'errors.session_expired',

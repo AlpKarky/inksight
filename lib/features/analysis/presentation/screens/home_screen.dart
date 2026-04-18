@@ -79,12 +79,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final loadingMessage = state.isLoading
         ? switch (pipelinePhase) {
-            AnalysisPipelinePhase.preparing =>
-                context.tr('analysis.preparing_image'),
-            AnalysisPipelinePhase.analyzing =>
-                context.tr('analysis.analyzing'),
-            AnalysisPipelinePhase.idle =>
-                context.tr('analysis.preparing_image'),
+            AnalysisPipelinePhase.preparing => context.tr(
+              'analysis.preparing_image',
+            ),
+            AnalysisPipelinePhase.analyzing => context.tr('analysis.analyzing'),
+            AnalysisPipelinePhase.idle => context.tr(
+              'analysis.preparing_image',
+            ),
           }
         : null;
 
