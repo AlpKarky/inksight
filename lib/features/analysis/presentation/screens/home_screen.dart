@@ -97,6 +97,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           title: Text(context.tr('app.name')),
           actions: [
             IconButton(
+              icon: const Icon(Icons.settings),
+              tooltip: context.tr('settings.tooltip'),
+              onPressed: () => context.push(Routes.settings),
+            ),
+            IconButton(
               icon: const Icon(Icons.history),
               tooltip: context.tr('analysis.history'),
               onPressed: () => context.push(Routes.history),

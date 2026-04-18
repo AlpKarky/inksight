@@ -70,5 +70,23 @@
     "save": "Save",
     "delete": "Delete",
     "close": "Close"
+  },
+  "settings": {
+    "title": "Settings",
+    "tooltip": "Settings",
+    "profile_section": "Profile",
+    "profile_unavailable": "Profile information is not available.",
+    "email_label": "Email",
+    "member_since": "Member since",
+    "appearance_section": "Appearance",
+    "theme_label": "Theme",
+    "theme_system": "System",
+    "theme_light": "Light",
+    "theme_dark": "Dark",
+    "language_section": "Language",
+    "language_label": "App language",
+    "language_en": "English",
+    "language_es": "Spanish",
+    "language_fr": "French"
   }
 }

@@ -15,6 +15,9 @@ import 'package:inksight/features/auth/data/datasources/auth_remote_data_source.
 import 'package:inksight/features/auth/data/datasources/auth_remote_data_source_impl.dart';
 import 'package:inksight/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:inksight/features/auth/presentation/viewmodels/auth_state_viewmodel.dart';
+import 'package:inksight/features/settings/data/datasources/settings_local_data_source_impl.dart';
+import 'package:inksight/features/settings/data/repositories/settings_repository_impl.dart';
+import 'package:inksight/features/settings/presentation/viewmodels/theme_mode_viewmodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -24,8 +27,7 @@ Future<void> bootstrap() async {
 
   final supabaseUrl = AppEnv.supabaseUrl;
   final supabaseKey = AppEnv.supabasePublishableKey;
-  final hasCredentials =
-      supabaseUrl.isNotEmpty && supabaseKey.isNotEmpty;
+  final hasCredentials = supabaseUrl.isNotEmpty && supabaseKey.isNotEmpty;
 
   if (!hasCredentials && !AppEnv.isDev) {
     throw StateError(
@@ -66,6 +68,10 @@ Future<void> bootstrap() async {
     localDataSource: AnalysisLocalDataSourceImpl(prefs: prefs),
   );
 
+  final settingsRepo = SettingsRepositoryImpl(
+    localDataSource: SettingsLocalDataSourceImpl(prefs: prefs),
+  );
+
   // -- Overrides --
   final overrides = [
     authRepositoryProvider.overrideWithValue(
@@ -75,11 +81,16 @@ Future<void> bootstrap() async {
     analysisHistoryRepositoryProvider.overrideWithValue(
       historyRepo,
     ),
+    settingsRepositoryProvider.overrideWithValue(settingsRepo),
   ];
 
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale('en')],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('es'),
+        Locale('fr'),
+      ],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
       child: ProviderScope(

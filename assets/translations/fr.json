@@ -1,0 +1,92 @@
+{
+  "app": {
+    "name": "InkSight"
+  },
+  "auth": {
+    "login_title": "Bon retour",
+    "login_subtitle": "Connectez-vous pour continuer",
+    "sign_up_title": "Créer un compte",
+    "sign_up_subtitle": "Inscrivez-vous pour commencer",
+    "email_hint": "Adresse e-mail",
+    "password_hint": "Mot de passe",
+    "sign_in_button": "Se connecter",
+    "sign_up_button": "S'inscrire",
+    "no_account": "Pas encore de compte ? ",
+    "no_account_action": "S'inscrire",
+    "have_account": "Déjà un compte ? ",
+    "have_account_action": "Se connecter"
+  },
+  "analysis": {
+    "title": "Analysez votre écriture",
+    "subtitle": "Téléchargez ou prenez une photo de votre écriture pour découvrir des éléments sur votre personnalité, la lisibilité et votre état émotionnel.",
+    "no_image": "Aucune image sélectionnée",
+    "camera": "Appareil photo",
+    "gallery": "Galerie",
+    "crop_title": "Recadrer l'image",
+    "analyze_button": "Analyser l'écriture",
+    "analyzing": "Analyse de l'écriture...",
+    "results_title": "Résultats de l'analyse",
+    "no_results": "Aucun résultat d'analyse disponible.",
+    "completed_on": "Terminé le {date}",
+    "personality_traits": "Traits de personnalité",
+    "legibility": "Évaluation de la lisibilité",
+    "emotional_state": "État émotionnel",
+    "save_button": "Enregistrer l'analyse",
+    "saved_success": "Analyse enregistrée avec succès.",
+    "history": "Analyses enregistrées",
+    "no_saved": "Aucune analyse enregistrée",
+    "no_saved_hint": "Les analyses que vous enregistrez apparaîtront ici.",
+    "load_error": "Impossible de charger les analyses enregistrées.",
+    "card_title": "Analyse d'écriture",
+    "view": "Voir",
+    "delete_title": "Supprimer l'analyse",
+    "delete_confirm": "Voulez-vous vraiment supprimer cette analyse ?",
+    "deleted": "Analyse supprimée."
+  },
+  "errors": {
+    "invalid_credentials": "E-mail ou mot de passe incorrect.",
+    "email_in_use": "Cette adresse e-mail est déjà utilisée.",
+    "weak_password": "Mot de passe trop faible. Utilisez au moins 6 caractères.",
+    "session_expired": "Session expirée. Veuillez vous reconnecter.",
+    "no_connection": "Pas de connexion internet. Vérifiez votre réseau.",
+    "server_error": "Erreur serveur. Réessayez plus tard.",
+    "timeout": "Délai dépassé. Réessayez.",
+    "unknown": "Une erreur inattendue s'est produite.",
+    "analysis_failed": "Impossible d'analyser l'écriture. Réessayez.",
+    "analysis_parse": "Impossible d'analyser le résultat. Essayez une autre image.",
+    "analysis_no_image": "Veuillez d'abord sélectionner une image."
+  },
+  "validation": {
+    "email_required": "L'e-mail est obligatoire.",
+    "email_invalid": "Veuillez saisir une adresse e-mail valide.",
+    "password_required": "Le mot de passe est obligatoire.",
+    "password_too_short": "Le mot de passe doit contenir au moins 6 caractères.",
+    "field_required": "Ce champ est obligatoire."
+  },
+  "common": {
+    "loading": "Chargement...",
+    "retry": "Réessayer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "close": "Fermer"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "tooltip": "Paramètres",
+    "profile_section": "Profil",
+    "profile_unavailable": "Les informations du profil ne sont pas disponibles.",
+    "email_label": "E-mail",
+    "member_since": "Membre depuis",
+    "appearance_section": "Apparence",
+    "theme_label": "Thème",
+    "theme_system": "Système",
+    "theme_light": "Clair",
+    "theme_dark": "Sombre",
+    "language_section": "Langue",
+    "language_label": "Langue de l'application",
+    "language_en": "Anglais",
+    "language_es": "Espagnol",
+    "language_fr": "Français"
+  }
+}

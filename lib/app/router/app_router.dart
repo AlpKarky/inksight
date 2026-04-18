@@ -6,6 +6,7 @@ import 'package:inksight/features/analysis/presentation/screens/result_screen.da
 import 'package:inksight/features/auth/domain/entities/user_entity.dart';
 import 'package:inksight/features/auth/presentation/screens/login_screen.dart';
 import 'package:inksight/features/auth/presentation/screens/sign_up_screen.dart';
+import 'package:inksight/features/settings/presentation/screens/settings_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_router.g.dart';
@@ -45,6 +46,10 @@ GoRouter appRouter(Ref ref, UserEntity? currentUser) {
       GoRoute(
         path: Routes.history,
         builder: (context, state) => const HistoryScreen(),
+      ),
+      GoRoute(
+        path: Routes.settings,
+        builder: (context, state) => const SettingsScreen(),
       ),
     ],
   );
