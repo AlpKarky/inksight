@@ -1,3 +1,7 @@
 {
-  "cSpell.words": ["inksight"]
+  "cSpell.words": ["inksight"],
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "Dart-Code.dart-code"
+  }
 }

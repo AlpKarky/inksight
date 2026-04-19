@@ -102,6 +102,14 @@ That matches how many teams document **contracts** (domain + core errors) withou
 
 **Reconsider if:** You introduce a subtree or provider category where **only** cacheable GET-style work runs and you want exponential backoff—then prefer **scoped** retry or **per-call** retry in the datasource rather than a blanket `Duration` at `ProviderScope` without auditing all async providers.
 
+### App bootstrap steps
+
+- **`lib/app/initialization/app_initialization.dart`** — `initializeAppShell()`: binding, `intl` date symbol data, `EasyLocalization.ensureInitialized()`.
+- **`lib/app/dependency_injection/app_provider_overrides.dart`** — `buildProviderOverrides()`: env checks, Supabase vs local auth, concrete repositories, and the `List<Override>` for `ProviderScope`.
+- **`lib/bootstrap.dart`** — awaits the two steps above, then `runApp` with `ProviderScope` (outermost, for `riverpod_lint`), then `EasyLocalization`, then `App` (including `retry` on `ProviderScope`).
+
+When adding features, extend **`buildProviderOverrides`** until it is large enough to split per-feature registrars.
+
 ## How to Add a New Feature
 
 1. Create `lib/features/<name>/` with `data/`, `domain/`, `presentation/` subdirectories

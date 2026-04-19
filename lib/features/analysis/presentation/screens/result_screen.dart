@@ -35,6 +35,8 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
     if (!mounted) return;
 
     if (saved) {
+      ref.invalidate(historyViewModelProvider);
+      if (!mounted) return;
       context.pushReplacement(Routes.history);
     } else {
       setState(() => _isSaving = false);
@@ -47,6 +49,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
   @override
   Widget build(BuildContext context) {
     final analysis = ref.watch(analysisViewModelProvider).value;
+    final historyAsync = ref.watch(historyViewModelProvider);
     final dims = context.dimensions;
 
     if (analysis == null) {
@@ -59,6 +62,11 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
         ),
       );
     }
+
+    final isAlreadySaved = historyAsync.maybeWhen(
+      data: (saved) => saved.any((a) => a.id == analysis.id),
+      orElse: () => false,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -104,12 +112,14 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
               data: analysis.emotionalState.data,
             ),
             SizedBox(height: dims.spacingLg),
-            AppButton(
-              label: context.tr('analysis.save_button'),
-              isLoading: _isSaving,
-              onPressed: _isSaving ? null : _saveAndNavigate,
-            ),
-            SizedBox(height: dims.spacingMd),
+            if (!isAlreadySaved) ...[
+              AppButton(
+                label: context.tr('analysis.save_button'),
+                isLoading: _isSaving,
+                onPressed: _isSaving ? null : _saveAndNavigate,
+              ),
+              SizedBox(height: dims.spacingMd),
+            ],
           ],
         ),
       ),

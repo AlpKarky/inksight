@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -69,6 +68,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     await ref
         .read(analysisViewModelProvider.notifier)
         .analyzeHandwriting(_selectedImage!);
+    if (!mounted) return;
+    final after = ref.read(analysisViewModelProvider);
+    if (after.hasValue && after.value != null) {
+      await context.push(Routes.result);
+    }
   }
 
   @override
@@ -97,10 +101,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             context,
           ),
         );
-      }
-
-      if (next.hasValue && next.value != null) {
-        unawaited(context.push(Routes.result));
       }
     });
 
