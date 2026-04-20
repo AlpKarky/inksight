@@ -5,8 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:inksight/core/theme/app_theme.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-/// Pumps [child] under EasyLocalization, [ProviderScope], and [MaterialApp] with
-/// app theme extensions (same layering as [bootstrap]).
+/// Pumps [child] under EasyLocalization, [ProviderScope], and [MaterialApp]
+/// with app theme extensions (mirrors the root setup in `lib/bootstrap.dart`).
 Future<void> pumpLocalizedApp(
   WidgetTester tester, {
   required Widget child,
