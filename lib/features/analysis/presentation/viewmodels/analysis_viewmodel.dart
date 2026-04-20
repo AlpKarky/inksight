@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:inksight/core/errors/result.dart';
-import 'package:inksight/features/analysis/domain/analysis_pipeline_phase.dart';
 import 'package:inksight/features/analysis/domain/entities/analysis_entity.dart';
 import 'package:inksight/features/analysis/domain/repositories/analysis_repository.dart';
 import 'package:inksight/features/analysis/presentation/viewmodels/analysis_pipeline_phase_viewmodel.dart';
@@ -30,7 +29,7 @@ class AnalysisViewModel extends _$AnalysisViewModel {
         imageFile,
         onPipelinePhase: (phase) {
           if (ref.mounted) {
-            ref.read(analysisPipelinePhaseProvider.notifier).state = phase;
+            ref.read(analysisPipelinePhaseProvider.notifier).setPhase(phase);
           }
         },
       );
@@ -42,8 +41,7 @@ class AnalysisViewModel extends _$AnalysisViewModel {
       };
     } finally {
       if (ref.mounted) {
-        ref.read(analysisPipelinePhaseProvider.notifier).state =
-            AnalysisPipelinePhase.idle;
+        ref.read(analysisPipelinePhaseProvider.notifier).reset();
       }
     }
   }
