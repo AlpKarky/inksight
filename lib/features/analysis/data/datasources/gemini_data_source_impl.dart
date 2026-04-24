@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:inksight/core/constants/debug_messages.dart';
 import 'package:inksight/core/errors/failures.dart';
+import 'package:inksight/core/utils/retry.dart';
 import 'package:inksight/features/analysis/data/datasources/analysis_remote_data_source.dart';
 import 'package:inksight/features/analysis/data/parsers/analysis_response_parser.dart';
 
@@ -13,16 +14,18 @@ class GeminiDataSourceImpl implements AnalysisRemoteDataSource {
     required String apiKey,
     required AnalysisResponseParser parser,
     http.Client? httpClient,
+    Duration retryBaseDelay = const Duration(milliseconds: 250),
   }) : _apiKey = apiKey,
        _parser = parser,
-       _httpClient = httpClient ?? http.Client();
+       _httpClient = httpClient ?? http.Client(),
+       _retryBaseDelay = retryBaseDelay;
 
   final String _apiKey;
   final AnalysisResponseParser _parser;
   final http.Client _httpClient;
+  final Duration _retryBaseDelay;
 
   static const _model = 'gemini-2.5-flash';
-  static const _maxAttempts = 3;
   static const _requestTimeout = Duration(seconds: 30);
 
   @override
@@ -36,47 +39,45 @@ class GeminiDataSourceImpl implements AnalysisRemoteDataSource {
       {'key': _apiKey},
     );
 
-    for (var attempt = 1; attempt <= _maxAttempts; attempt++) {
-      try {
-        final response = await _httpClient
-            .post(
-              endpoint,
-              headers: const {'Content-Type': 'application/json'},
-              body: jsonEncode(_buildRequestBody(imageBytes)),
-            )
-            .timeout(_requestTimeout);
+    return retryWithBackoff(
+      () => _performRequest(endpoint, imageBytes),
+      baseDelay: _retryBaseDelay,
+      shouldRetry: (error) => error is AppFailure && error.isTransient,
+      retryAfter: (error) =>
+          error is AnalysisRateLimitFailure ? error.retryAfter : null,
+    );
+  }
 
-        if (response.statusCode != 200) {
-          throw _mapApiError(response);
-        }
+  Future<Map<String, dynamic>> _performRequest(
+    Uri endpoint,
+    List<int> imageBytes,
+  ) async {
+    try {
+      final response = await _httpClient
+          .post(
+            endpoint,
+            headers: const {'Content-Type': 'application/json'},
+            body: jsonEncode(_buildRequestBody(imageBytes)),
+          )
+          .timeout(_requestTimeout);
 
-        final responseText = _extractResponseText(response.body);
-        return _parser.parseGeminiResponse(responseText);
-      } on AppFailure {
-        if (attempt == _maxAttempts) rethrow;
-      } on SocketException catch (e, stackTrace) {
-        if (attempt == _maxAttempts) {
-          throw NoConnectionFailure(cause: e, stackTrace: stackTrace);
-        }
-      } on TimeoutException catch (e, stackTrace) {
-        if (attempt == _maxAttempts) {
-          throw TimeoutFailure(cause: e, stackTrace: stackTrace);
-        }
-      } on http.ClientException catch (e, stackTrace) {
-        if (attempt == _maxAttempts) {
-          throw NoConnectionFailure(cause: e, stackTrace: stackTrace);
-        }
-      } on Exception catch (e, stackTrace) {
-        if (attempt == _maxAttempts) {
-          throw AnalysisRemoteFailure(
-            cause: e,
-            stackTrace: stackTrace,
-          );
-        }
+      if (response.statusCode != 200) {
+        throw _mapApiError(response);
       }
-    }
 
-    throw const AnalysisRemoteFailure();
+      final responseText = _extractResponseText(response.body);
+      return _parser.parseGeminiResponse(responseText);
+    } on AppFailure {
+      rethrow;
+    } on SocketException catch (e, stackTrace) {
+      throw NoConnectionFailure(cause: e, stackTrace: stackTrace);
+    } on TimeoutException catch (e, stackTrace) {
+      throw TimeoutFailure(cause: e, stackTrace: stackTrace);
+    } on http.ClientException catch (e, stackTrace) {
+      throw NoConnectionFailure(cause: e, stackTrace: stackTrace);
+    } on Exception catch (e, stackTrace) {
+      throw AnalysisRemoteFailure(cause: e, stackTrace: stackTrace);
+    }
   }
 
   Map<String, dynamic> _buildRequestBody(List<int> imageBytes) {
@@ -180,9 +181,9 @@ class GeminiDataSourceImpl implements AnalysisRemoteDataSource {
       }
 
       if (response.statusCode == 429) {
-        return AnalysisRemoteFailure(
-          message: DebugMessages.analysisQuotaExceeded,
+        return AnalysisRateLimitFailure(
           cause: apiMessage,
+          retryAfter: _parseRetryAfter(response),
         );
       }
 
@@ -192,5 +193,17 @@ class GeminiDataSourceImpl implements AnalysisRemoteDataSource {
         message: 'Status ${response.statusCode}',
       );
     }
+  }
+
+  /// Parses the HTTP `Retry-After` header as a delta-seconds value.
+  ///
+  /// RFC 7231 also permits an HTTP-date; we accept only integer seconds
+  /// today — Gemini's 429s have consistently used that form.
+  Duration? _parseRetryAfter(http.Response response) {
+    final header = response.headers['retry-after'];
+    if (header == null) return null;
+    final seconds = int.tryParse(header.trim());
+    if (seconds == null || seconds < 0) return null;
+    return Duration(seconds: seconds);
   }
 }

@@ -219,3 +219,31 @@ final class AnalysisImageTooLargeFailure extends AnalysisFailure {
     super.stackTrace,
   });
 }
+
+/// Remote analysis API refused the request for exceeding its rate limit (429).
+final class AnalysisRateLimitFailure extends AnalysisFailure {
+  /// Creates an [AnalysisRateLimitFailure].
+  ///
+  /// [retryAfter] is the server-hinted wait (parsed from `Retry-After`).
+  const AnalysisRateLimitFailure({
+    super.message = DebugMessages.analysisQuotaExceeded,
+    super.cause,
+    super.stackTrace,
+    this.retryAfter,
+  });
+
+  /// Server-hinted delay before the next retry, if provided.
+  final Duration? retryAfter;
+}
+
+/// Classifies failures as retryable (transient) vs. terminal.
+extension AppFailureRetry on AppFailure {
+  /// Whether retrying this failure could plausibly succeed.
+  bool get isTransient => switch (this) {
+    NoConnectionFailure() => true,
+    TimeoutFailure() => true,
+    ServerFailure() => true,
+    AnalysisRateLimitFailure() => true,
+    _ => false,
+  };
+}
