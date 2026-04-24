@@ -57,7 +57,8 @@
     "analysis_parse": "Could not parse the analysis. Please try a different image.",
     "analysis_no_image": "Please select an image first.",
     "analysis_image_decode": "Could not read this image. Try another photo.",
-    "analysis_image_too_large": "This image is still too large. Try a smaller or lower-resolution photo."
+    "analysis_image_too_large": "This image is still too large. Try a smaller or lower-resolution photo.",
+    "rate_limit": "Too many requests. Please try again in a moment."
   },
   "validation": {
     "email_required": "Email is required.",

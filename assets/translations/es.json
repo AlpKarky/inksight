@@ -57,7 +57,8 @@
     "analysis_parse": "No se pudo interpretar el análisis. Prueba con otra imagen.",
     "analysis_no_image": "Selecciona una imagen primero.",
     "analysis_image_decode": "No se pudo leer esta imagen. Prueba con otra foto.",
-    "analysis_image_too_large": "La imagen sigue siendo demasiado grande. Prueba con una foto más pequeña o de menor resolución."
+    "analysis_image_too_large": "La imagen sigue siendo demasiado grande. Prueba con una foto más pequeña o de menor resolución.",
+    "rate_limit": "Demasiadas solicitudes. Inténtalo de nuevo en un momento."
   },
   "validation": {
     "email_required": "El correo es obligatorio.",
