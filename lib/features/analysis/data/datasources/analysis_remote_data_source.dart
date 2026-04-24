@@ -1,7 +1,7 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 abstract class AnalysisRemoteDataSource {
   Future<Map<String, dynamic>> analyzeHandwriting({
-    required File imageFile,
+    required Uint8List imageBytes,
   });
 }

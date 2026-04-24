@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:inksight/core/errors/failures.dart';
 import 'package:inksight/core/errors/result.dart';
+import 'package:inksight/features/analysis/data/datasources/analysis_image_storage.dart';
 import 'package:inksight/features/analysis/data/datasources/analysis_remote_data_source.dart';
 import 'package:inksight/features/analysis/data/models/analysis_model.dart';
 import 'package:inksight/features/analysis/data/utils/image_pipeline.dart';
@@ -15,11 +16,14 @@ import 'package:uuid/uuid.dart';
 class AnalysisRepositoryImpl implements AnalysisRepository {
   AnalysisRepositoryImpl({
     required AnalysisRemoteDataSource remoteDataSource,
+    required AnalysisImageStorage imageStorage,
     Uuid? uuid,
   }) : _remoteDataSource = remoteDataSource,
+       _imageStorage = imageStorage,
        _uuid = uuid ?? const Uuid();
 
   final AnalysisRemoteDataSource _remoteDataSource;
+  final AnalysisImageStorage _imageStorage;
   final Uuid _uuid;
 
   @override
@@ -50,36 +54,39 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
         );
       }
 
-      final tempFile = File(
-        '${Directory.systemTemp.path}'
-        '/inksight_analysis_${_uuid.v4()}.jpg',
+      onPipelinePhase?.call(AnalysisPipelinePhase.analyzing);
+
+      final rawData = await _remoteDataSource.analyzeHandwriting(
+        imageBytes: preparedBytes,
       );
 
+      final analysisId = _uuid.v4();
+
+      // Persist prepared bytes so the history entry survives picker/cropper
+      // temp cleanup. If this fails we still return the analysis — losing a
+      // thumbnail is better than losing the result (and Gemini quota).
+      String imagePath;
       try {
-        await tempFile.writeAsBytes(preparedBytes);
-        onPipelinePhase?.call(AnalysisPipelinePhase.analyzing);
-
-        final rawData = await _remoteDataSource.analyzeHandwriting(
-          imageFile: tempFile,
+        imagePath = await _imageStorage.save(
+          analysisId: analysisId,
+          bytes: preparedBytes,
         );
-
-        final model = AnalysisModel(
-          id: _uuid.v4(),
-          timestamp: DateTime.now(),
-          imagePath: imageFile.path,
-          personalityTraits:
-              rawData['personality_traits'] as Map<String, dynamic>,
-          legibilityAssessment:
-              rawData['legibility_assessment'] as Map<String, dynamic>,
-          emotionalState: rawData['emotional_state'] as Map<String, dynamic>,
-        );
-
-        return Success(model.toDomain());
-      } finally {
-        if (tempFile.existsSync()) {
-          await tempFile.delete();
-        }
+      } on Object {
+        imagePath = '';
       }
+
+      final model = AnalysisModel(
+        id: analysisId,
+        timestamp: DateTime.now(),
+        imagePath: imagePath,
+        personalityTraits:
+            rawData['personality_traits'] as Map<String, dynamic>,
+        legibilityAssessment:
+            rawData['legibility_assessment'] as Map<String, dynamic>,
+        emotionalState: rawData['emotional_state'] as Map<String, dynamic>,
+      );
+
+      return Success(model.toDomain());
     } on AppFailure catch (e) {
       return Failure(e);
     }

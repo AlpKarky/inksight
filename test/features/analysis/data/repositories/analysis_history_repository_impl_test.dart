@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:inksight/core/errors/failures.dart';
 import 'package:inksight/core/errors/result.dart';
+import 'package:inksight/features/analysis/data/datasources/analysis_image_storage.dart';
 import 'package:inksight/features/analysis/data/datasources/analysis_local_data_source.dart';
 import 'package:inksight/features/analysis/data/models/analysis_model.dart';
 import 'package:inksight/features/analysis/data/repositories/analysis_history_repository_impl.dart';
@@ -10,15 +13,22 @@ import 'package:mocktail/mocktail.dart';
 class MockAnalysisLocalDataSource extends Mock
     implements AnalysisLocalDataSource {}
 
+class MockAnalysisImageStorage extends Mock implements AnalysisImageStorage {}
+
 void main() {
   late MockAnalysisLocalDataSource mockLocalDataSource;
+  late MockAnalysisImageStorage mockImageStorage;
   late AnalysisHistoryRepositoryImpl repository;
 
   setUp(() {
     mockLocalDataSource = MockAnalysisLocalDataSource();
+    mockImageStorage = MockAnalysisImageStorage();
     repository = AnalysisHistoryRepositoryImpl(
       localDataSource: mockLocalDataSource,
+      imageStorage: mockImageStorage,
     );
+
+    when(() => mockImageStorage.delete(any())).thenAnswer((_) async {});
   });
 
   setUpAll(() {
@@ -98,6 +108,29 @@ void main() {
       when(
         () => mockLocalDataSource.deleteAnalysis(any()),
       ).thenAnswer((_) async {});
+
+      final result = await repository.deleteAnalysis('1');
+
+      expect(result, isA<Success<void>>());
+    });
+
+    test('also removes the stored image on successful delete', () async {
+      when(
+        () => mockLocalDataSource.deleteAnalysis(any()),
+      ).thenAnswer((_) async {});
+
+      await repository.deleteAnalysis('abc');
+
+      verify(() => mockImageStorage.delete('abc')).called(1);
+    });
+
+    test('still returns Success when image delete fails', () async {
+      when(
+        () => mockLocalDataSource.deleteAnalysis(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockImageStorage.delete(any()),
+      ).thenThrow(const FileSystemException('gone'));
 
       final result = await repository.deleteAnalysis('1');
 

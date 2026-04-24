@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 import 'package:inksight/core/constants/debug_messages.dart';
@@ -30,9 +31,8 @@ class GeminiDataSourceImpl implements AnalysisRemoteDataSource {
 
   @override
   Future<Map<String, dynamic>> analyzeHandwriting({
-    required File imageFile,
+    required Uint8List imageBytes,
   }) async {
-    final imageBytes = await imageFile.readAsBytes();
     final endpoint = Uri.https(
       'generativelanguage.googleapis.com',
       '/v1beta/models/$_model:generateContent',
