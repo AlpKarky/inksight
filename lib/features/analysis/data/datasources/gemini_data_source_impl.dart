@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -22,6 +23,7 @@ class GeminiDataSourceImpl implements AnalysisRemoteDataSource {
 
   static const _model = 'gemini-2.5-flash';
   static const _maxAttempts = 3;
+  static const _requestTimeout = Duration(seconds: 30);
 
   @override
   Future<Map<String, dynamic>> analyzeHandwriting({
@@ -36,11 +38,13 @@ class GeminiDataSourceImpl implements AnalysisRemoteDataSource {
 
     for (var attempt = 1; attempt <= _maxAttempts; attempt++) {
       try {
-        final response = await _httpClient.post(
-          endpoint,
-          headers: const {'Content-Type': 'application/json'},
-          body: jsonEncode(_buildRequestBody(imageBytes)),
-        );
+        final response = await _httpClient
+            .post(
+              endpoint,
+              headers: const {'Content-Type': 'application/json'},
+              body: jsonEncode(_buildRequestBody(imageBytes)),
+            )
+            .timeout(_requestTimeout);
 
         if (response.statusCode != 200) {
           throw _mapApiError(response);
@@ -50,6 +54,18 @@ class GeminiDataSourceImpl implements AnalysisRemoteDataSource {
         return _parser.parseGeminiResponse(responseText);
       } on AppFailure {
         if (attempt == _maxAttempts) rethrow;
+      } on SocketException catch (e, stackTrace) {
+        if (attempt == _maxAttempts) {
+          throw NoConnectionFailure(cause: e, stackTrace: stackTrace);
+        }
+      } on TimeoutException catch (e, stackTrace) {
+        if (attempt == _maxAttempts) {
+          throw TimeoutFailure(cause: e, stackTrace: stackTrace);
+        }
+      } on http.ClientException catch (e, stackTrace) {
+        if (attempt == _maxAttempts) {
+          throw NoConnectionFailure(cause: e, stackTrace: stackTrace);
+        }
       } on Exception catch (e, stackTrace) {
         if (attempt == _maxAttempts) {
           throw AnalysisRemoteFailure(
