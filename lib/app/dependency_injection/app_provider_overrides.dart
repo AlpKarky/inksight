@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inksight/core/env/app_env.dart';
+import 'package:inksight/features/analysis/data/datasources/analysis_image_storage.dart';
 import 'package:inksight/features/analysis/data/datasources/analysis_local_data_source.dart';
 import 'package:inksight/features/analysis/data/datasources/gemini_data_source_impl.dart';
 import 'package:inksight/features/analysis/data/parsers/analysis_response_parser.dart';
@@ -15,6 +16,7 @@ import 'package:inksight/features/auth/presentation/viewmodels/auth_state_viewmo
 import 'package:inksight/features/settings/data/datasources/settings_local_data_source_impl.dart';
 import 'package:inksight/features/settings/data/repositories/settings_repository_impl.dart';
 import 'package:inksight/features/settings/presentation/viewmodels/theme_mode_viewmodel.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:riverpod/misc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -52,16 +54,23 @@ Future<List<Override>> buildProviderOverrides() async {
   final geminiApiKey = AppEnv.geminiApiKey;
   final parser = AnalysisResponseParser();
 
+  final documentsDirectory = await getApplicationDocumentsDirectory();
+  final imageStorage = AnalysisImageStorageImpl(
+    baseDirectory: documentsDirectory,
+  );
+
   final analysisRepo = AnalysisRepositoryImpl(
     remoteDataSource: GeminiDataSourceImpl(
       apiKey: geminiApiKey,
       parser: parser,
     ),
+    imageStorage: imageStorage,
   );
 
   final prefs = await SharedPreferences.getInstance();
   final historyRepo = AnalysisHistoryRepositoryImpl(
     localDataSource: AnalysisLocalDataSourceImpl(prefs: prefs),
+    imageStorage: imageStorage,
   );
 
   final settingsRepo = SettingsRepositoryImpl(

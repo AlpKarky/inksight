@@ -1,5 +1,7 @@
 import 'package:inksight/core/errors/failures.dart';
 import 'package:inksight/core/errors/result.dart';
+import 'package:inksight/core/logging/app_logger.dart';
+import 'package:inksight/features/analysis/data/datasources/analysis_image_storage.dart';
 import 'package:inksight/features/analysis/data/datasources/analysis_local_data_source.dart';
 import 'package:inksight/features/analysis/data/models/analysis_model.dart';
 import 'package:inksight/features/analysis/domain/entities/analysis_entity.dart';
@@ -8,9 +10,15 @@ import 'package:inksight/features/analysis/domain/repositories/analysis_history_
 class AnalysisHistoryRepositoryImpl implements AnalysisHistoryRepository {
   AnalysisHistoryRepositoryImpl({
     required AnalysisLocalDataSource localDataSource,
-  }) : _localDataSource = localDataSource;
+    required AnalysisImageStorage imageStorage,
+    AppLogger? logger,
+  }) : _localDataSource = localDataSource,
+       _imageStorage = imageStorage,
+       _logger = logger ?? const DefaultLogger();
 
   final AnalysisLocalDataSource _localDataSource;
+  final AnalysisImageStorage _imageStorage;
+  final AppLogger _logger;
 
   @override
   Future<Result<List<AnalysisEntity>>> getSavedAnalyses() async {
@@ -48,6 +56,15 @@ class AnalysisHistoryRepositoryImpl implements AnalysisHistoryRepository {
   Future<Result<void>> deleteAnalysis(String id) async {
     try {
       await _localDataSource.deleteAnalysis(id);
+
+      // Best-effort: user-visible entry is already gone. An orphan
+      // image is invisible and cheap to prune later.
+      try {
+        await _imageStorage.delete(id);
+      } on Object catch (e) {
+        _logger.warning('Failed to delete image for analysis $id: $e');
+      }
+
       return const Success(null);
     } on AppFailure catch (e) {
       return Failure(e);

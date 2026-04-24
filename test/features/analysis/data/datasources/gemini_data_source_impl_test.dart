@@ -13,15 +13,10 @@ class MockHttpClient extends Mock implements http.Client {}
 
 class FakeUri extends Fake implements Uri {}
 
-class FakeImageFile extends Fake implements File {
-  @override
-  Future<Uint8List> readAsBytes() async => Uint8List.fromList([0, 1, 2, 3]);
-}
-
 void main() {
   late MockHttpClient mockHttpClient;
   late GeminiDataSourceImpl dataSource;
-  late File fakeFile;
+  late Uint8List fakeBytes;
 
   setUpAll(() {
     registerFallbackValue(FakeUri());
@@ -35,7 +30,7 @@ void main() {
       httpClient: mockHttpClient,
       retryBaseDelay: Duration.zero,
     );
-    fakeFile = FakeImageFile();
+    fakeBytes = Uint8List.fromList([0, 1, 2, 3]);
   });
 
   group('GeminiDataSourceImpl network failure classification', () {
@@ -49,7 +44,7 @@ void main() {
       ).thenThrow(const SocketException('offline'));
 
       await expectLater(
-        dataSource.analyzeHandwriting(imageFile: fakeFile),
+        dataSource.analyzeHandwriting(imageBytes: fakeBytes),
         throwsA(isA<NoConnectionFailure>()),
       );
     });
@@ -64,7 +59,7 @@ void main() {
       ).thenThrow(TimeoutException('slow'));
 
       await expectLater(
-        dataSource.analyzeHandwriting(imageFile: fakeFile),
+        dataSource.analyzeHandwriting(imageBytes: fakeBytes),
         throwsA(isA<TimeoutFailure>()),
       );
     });
@@ -79,7 +74,7 @@ void main() {
       ).thenThrow(http.ClientException('connection reset'));
 
       await expectLater(
-        dataSource.analyzeHandwriting(imageFile: fakeFile),
+        dataSource.analyzeHandwriting(imageBytes: fakeBytes),
         throwsA(isA<NoConnectionFailure>()),
       );
     });
@@ -94,7 +89,7 @@ void main() {
       ).thenThrow(Exception('something unusual'));
 
       await expectLater(
-        dataSource.analyzeHandwriting(imageFile: fakeFile),
+        dataSource.analyzeHandwriting(imageBytes: fakeBytes),
         throwsA(isA<AnalysisRemoteFailure>()),
       );
     });
@@ -114,7 +109,7 @@ void main() {
       );
 
       await expectLater(
-        dataSource.analyzeHandwriting(imageFile: fakeFile),
+        dataSource.analyzeHandwriting(imageBytes: fakeBytes),
         throwsA(isA<AnalysisRemoteFailure>()),
       );
     });
@@ -134,7 +129,7 @@ void main() {
       );
 
       await expectLater(
-        dataSource.analyzeHandwriting(imageFile: fakeFile),
+        dataSource.analyzeHandwriting(imageBytes: fakeBytes),
         throwsA(isA<ServerFailure>()),
       );
     });
@@ -154,7 +149,7 @@ void main() {
       );
 
       await expectLater(
-        dataSource.analyzeHandwriting(imageFile: fakeFile),
+        dataSource.analyzeHandwriting(imageBytes: fakeBytes),
         throwsA(
           isA<AnalysisRateLimitFailure>().having(
             (f) => f.retryAfter,
@@ -182,7 +177,7 @@ void main() {
       );
 
       await expectLater(
-        dataSource.analyzeHandwriting(imageFile: fakeFile),
+        dataSource.analyzeHandwriting(imageBytes: fakeBytes),
         throwsA(
           isA<AnalysisRateLimitFailure>().having(
             (f) => f.retryAfter,
@@ -216,7 +211,7 @@ void main() {
         return http.Response(successBody, 200);
       });
 
-      final result = await dataSource.analyzeHandwriting(imageFile: fakeFile);
+      final result = await dataSource.analyzeHandwriting(imageBytes: fakeBytes);
       expect(calls, 3);
       expect(result.containsKey('personality_traits'), isTrue);
     });
@@ -238,7 +233,7 @@ void main() {
       });
 
       await expectLater(
-        dataSource.analyzeHandwriting(imageFile: fakeFile),
+        dataSource.analyzeHandwriting(imageBytes: fakeBytes),
         throwsA(isA<AnalysisRemoteFailure>()),
       );
       expect(calls, 1);
@@ -258,7 +253,7 @@ void main() {
       });
 
       await expectLater(
-        dataSource.analyzeHandwriting(imageFile: fakeFile),
+        dataSource.analyzeHandwriting(imageBytes: fakeBytes),
         throwsA(isA<ServerFailure>()),
       );
       expect(calls, 3);
