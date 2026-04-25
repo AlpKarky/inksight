@@ -16,6 +16,10 @@ migrate_working_dir/
 .env.staging
 .env.prod
 
+# Supabase CLI link state + any local Edge Function .env
+.supabase/
+/supabase/functions/**/.env
+
 # IntelliJ related
 *.iml
 *.ipr

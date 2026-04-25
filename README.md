@@ -60,8 +60,11 @@ See [docs/architecture.md](docs/architecture.md) for the full architecture guide
    ENV=dev
    SUPABASE_URL=https://your-project.supabase.co
    SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-key-here
-   GEMINI_API_KEY=your-gemini-api-key-here
    ```
+
+   The Gemini API key lives **server-side** as a Supabase Edge Function
+   secret — see [docs/supabase-setup.md](docs/supabase-setup.md) for
+   how to deploy the function and set the secret.
 
 4. Run code generation:
    ```bash
