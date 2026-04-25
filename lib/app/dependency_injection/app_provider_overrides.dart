@@ -1,8 +1,13 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:inksight/core/constants/debug_messages.dart';
 import 'package:inksight/core/env/app_env.dart';
+import 'package:inksight/core/errors/failures.dart';
 import 'package:inksight/features/analysis/data/datasources/analysis_image_storage.dart';
 import 'package:inksight/features/analysis/data/datasources/analysis_local_data_source.dart';
-import 'package:inksight/features/analysis/data/datasources/gemini_data_source_impl.dart';
+import 'package:inksight/features/analysis/data/datasources/analysis_remote_data_source.dart';
+import 'package:inksight/features/analysis/data/datasources/analysis_remote_data_source_impl.dart';
 import 'package:inksight/features/analysis/data/parsers/analysis_response_parser.dart';
 import 'package:inksight/features/analysis/data/repositories/analysis_history_repository_impl.dart';
 import 'package:inksight/features/analysis/data/repositories/analysis_repository_impl.dart';
@@ -51,7 +56,6 @@ Future<List<Override>> buildProviderOverrides() async {
     authDataSource = AuthLocalDataSource();
   }
 
-  final geminiApiKey = AppEnv.geminiApiKey;
   final parser = AnalysisResponseParser();
 
   final documentsDirectory = await getApplicationDocumentsDirectory();
@@ -59,11 +63,16 @@ Future<List<Override>> buildProviderOverrides() async {
     baseDirectory: documentsDirectory,
   );
 
+  final analysisDataSource = hasCredentials
+      ? AnalysisRemoteDataSourceImpl(
+              client: Supabase.instance.client,
+              parser: parser,
+            )
+            as AnalysisRemoteDataSource
+      : const _UnconfiguredAnalysisDataSource();
+
   final analysisRepo = AnalysisRepositoryImpl(
-    remoteDataSource: GeminiDataSourceImpl(
-      apiKey: geminiApiKey,
-      parser: parser,
-    ),
+    remoteDataSource: analysisDataSource,
     imageStorage: imageStorage,
   );
 
@@ -87,4 +96,22 @@ Future<List<Override>> buildProviderOverrides() async {
     ),
     settingsRepositoryProvider.overrideWithValue(settingsRepo),
   ];
+}
+
+/// Stand-in used in dev mode without Supabase credentials. Lets the app
+/// boot, but any attempt to analyze surfaces a clear configuration error
+/// instead of a confusing null/network failure.
+class _UnconfiguredAnalysisDataSource implements AnalysisRemoteDataSource {
+  const _UnconfiguredAnalysisDataSource();
+
+  @override
+  Future<Map<String, dynamic>> analyzeHandwriting({
+    required Uint8List imageBytes,
+  }) async {
+    throw const AnalysisRemoteFailure(
+      message:
+          'Supabase credentials are required to call the analysis '
+          'Edge Function. ${DebugMessages.authNotConfigured}',
+    );
+  }
 }

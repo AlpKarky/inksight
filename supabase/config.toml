@@ -1,0 +1,11 @@
+# Supabase project configuration scoped to the inksight app.
+# Most settings live in the Supabase Studio dashboard; this file pins the
+# values that should not drift between local and remote environments.
+
+project_id = "inksight"
+
+[functions.analyze-handwriting]
+# Gates access on a valid Supabase user JWT before invoking the function.
+# The function ALSO re-validates via getClaims() so it can extract user_id
+# for audit/rate-limiting in a follow-up. Keep this true.
+verify_jwt = true

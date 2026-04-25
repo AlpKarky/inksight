@@ -29,6 +29,16 @@ class AnalysisResponseParser {
       );
     }
 
+    return standardizeAnalysisJson(decoded);
+  }
+
+  /// Normalizes a [decoded] analysis JSON object: rewrites alternate keys
+  /// the model sometimes emits ("Personality Traits" vs
+  /// "personality_traits") and asserts all required sections are present.
+  ///
+  /// Useful when the response was already decoded upstream — e.g. by an
+  /// Edge Function — and only needs the standardization step.
+  Map<String, dynamic> standardizeAnalysisJson(Map<String, dynamic> decoded) {
     final standardized = _standardizeKeys(decoded);
     _validateRequiredSections(standardized);
     return standardized;
