@@ -127,9 +127,14 @@ void main() {
 
       expect(find.text('Delete Analysis'), findsOneWidget);
 
-      // Tap the confirmation Delete button (the second 'Delete' — first is on
-      // the card, second is in the dialog).
-      await tester.tap(find.widgetWithText(TextButton, 'Delete'));
+      // Scope to the AlertDialog — each history card also exposes a "Delete"
+      // TextButton, so an unscoped finder matches multiple widgets.
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.widgetWithText(TextButton, 'Delete'),
+        ),
+      );
       await tester.pumpAndSettle();
 
       verify(() => mockRepository.deleteAnalysis('1')).called(1);
